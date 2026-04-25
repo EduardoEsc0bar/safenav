@@ -99,7 +99,7 @@ main {
   margin: 0;
   max-width: 920px;
   color: #ffffff;
-  font-size: clamp(3.2rem, 7vw, 7.4rem);
+  font-size: clamp(2.8rem, 5.6vw, 5.8rem);
   font-weight: 900;
   line-height: 0.86;
 }
@@ -903,32 +903,22 @@ input[type="range"] {
 }
 
 @media (min-width: 1181px) {
-  .mainColumn {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(520px, 0.95fr);
-    align-items: stretch;
-  }
-
-  .mainColumn > .mappingPanel,
-  .mainColumn > .mapPanel {
-    min-height: min(650px, calc(100vh - 230px));
-  }
-
   .mainColumn > .mappingPanel {
-    padding: clamp(16px, 1.5vw, 24px);
+    min-height: min(720px, calc(100vh - 230px));
+    padding: clamp(20px, 2vw, 30px);
   }
 
   .mainColumn > .mappingPanel .sectionHeader h2 {
-    font-size: clamp(2.6rem, 4.4vw, 5.4rem);
+    font-size: clamp(3.2rem, 5.8vw, 6.4rem);
   }
 
   .mainColumn > .mappingPanel .panelCopy {
-    font-size: clamp(0.95rem, 1.05vw, 1.25rem);
+    font-size: clamp(1rem, 1.35vw, 1.45rem);
   }
 
   .mainColumn > .mappingPanel .buttonGrid.compact {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-width: none;
+    grid-template-columns: repeat(2, minmax(0, 260px));
+    max-width: 560px;
   }
 
   .mainColumn > .mappingPanel .featureGrid {
@@ -936,25 +926,11 @@ input[type="range"] {
   }
 
   .mainColumn > .mappingPanel .mappingViz {
-    height: clamp(230px, 28vh, 350px);
+    height: clamp(280px, 36vh, 470px);
   }
 
   .mainColumn > .mappingPanel .instanceStrip {
-    grid-template-columns: 1fr;
-  }
-
-  .mainColumn > .mapPanel {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-  }
-
-  .mainColumn > .mapPanel .campusMap {
-    height: 100%;
-    min-height: 520px;
-  }
-
-  .mainColumn > .explanationBand {
-    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
