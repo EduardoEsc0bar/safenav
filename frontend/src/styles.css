@@ -1201,6 +1201,579 @@ input[type="range"] {
   line-height: 1.52;
 }
 
+/* HUD launch experience */
+.hudNav {
+  height: 80px;
+  border-bottom: 1px solid rgba(199, 255, 0, 0.16);
+  background: rgba(1, 6, 7, 0.94);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 28px;
+  padding: 0 clamp(22px, 3.8vw, 54px);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.hudBrand,
+.hudNavLinks,
+.hudNavActions {
+  display: flex;
+  align-items: center;
+}
+
+.hudBrand {
+  gap: 12px;
+  color: #f7f7f2;
+  font-size: 1.45rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.hudBrand svg {
+  color: #ffffff;
+}
+
+.hudNavLinks {
+  justify-content: center;
+  gap: clamp(24px, 4vw, 64px);
+  color: #d7d9d1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hudNavActions {
+  gap: 14px;
+}
+
+.hudNavActions button,
+.hudHeroActions button,
+.hudAccentButton,
+.routeSummaryStage button {
+  min-height: 48px;
+  border-color: rgba(235, 235, 224, 0.24);
+  background: rgba(0, 0, 0, 0.42);
+  color: #f7f7f2;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.08em;
+}
+
+.hudAccentButton,
+.hudAccentButton.uploadButton {
+  border-color: rgba(207, 255, 0, 0.86);
+  background: #ccff00;
+  color: #061006;
+}
+
+.hudAccentButton:hover,
+.hudAccentButton.uploadButton:hover {
+  border-color: #e4ff56;
+  background: #e1ff39;
+  color: #061006;
+}
+
+.hudHero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(360px, 0.45fr) minmax(0, 1fr);
+  min-height: 475px;
+  margin: 0 clamp(22px, 3.8vw, 54px);
+  padding: 44px 28px 20px;
+  border: 1px solid rgba(235, 235, 224, 0.14);
+  border-top: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 83% 68%, rgba(255, 43, 31, 0.2), transparent 150px),
+    radial-gradient(circle at 50% 56%, rgba(207, 255, 0, 0.12), transparent 180px),
+    linear-gradient(90deg, rgba(0, 9, 10, 0.98), rgba(2, 13, 15, 0.82) 42%, rgba(1, 5, 7, 0.98)),
+    #010405;
+}
+
+.hudHero::before,
+.hudHero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hudHero::before {
+  opacity: 0.42;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 108px, rgba(235, 235, 224, 0.08) 109px 110px),
+    repeating-linear-gradient(180deg, transparent 0 58px, rgba(235, 235, 224, 0.08) 59px 60px);
+}
+
+.hudHero::after {
+  background:
+    linear-gradient(90deg, transparent 0 42%, rgba(235, 235, 224, 0.16) 42.05% 42.15%, transparent 42.25%),
+    linear-gradient(180deg, transparent 0 53%, rgba(235, 235, 224, 0.16) 53.05% 53.15%, transparent 53.25%);
+}
+
+.hudHeroCopy,
+.hudMapStage,
+.hudWorkflow,
+.hudFeatureStrip {
+  position: relative;
+  z-index: 1;
+}
+
+.hudHeroCopy {
+  max-width: 620px;
+  padding-top: 8px;
+}
+
+.hudStep,
+.hudFormats {
+  color: #b5b9b2;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.86rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.hudStep strong {
+  color: #ccff00;
+}
+
+.hudHeroCopy h1 {
+  margin: 26px 0 0;
+  max-width: 610px;
+  color: #f3f3ed;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", Inter, sans-serif;
+  font-size: clamp(4rem, 7.3vw, 6.6rem);
+  font-weight: 900;
+  line-height: 0.96;
+  text-transform: uppercase;
+}
+
+.hudHeroCopy > p:not(.hudStep) {
+  max-width: 470px;
+  color: #aeb3ae;
+  font-size: 1.18rem;
+  line-height: 1.55;
+  margin: 20px 0 0;
+}
+
+.hudHeroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.hudHeroActions button,
+.hudHeroActions .uploadButton {
+  min-width: 200px;
+  justify-content: space-between;
+  padding: 0 22px;
+}
+
+.hudFormats {
+  display: block;
+  margin-top: 22px;
+  line-height: 1.65;
+}
+
+.hudMapStage {
+  min-height: 430px;
+}
+
+.hudBlueprint {
+  width: 100%;
+  height: 100%;
+  min-height: 430px;
+}
+
+.wireBuilding {
+  fill: transparent;
+  stroke: rgba(235, 235, 224, 0.2);
+  stroke-width: 0.18;
+}
+
+.routeGlow {
+  fill: none;
+  stroke: rgba(207, 255, 0, 0.22);
+  stroke-width: 3.2;
+  filter: url(#glow);
+}
+
+.routeDot {
+  filter: url(#glow);
+}
+
+.routeDot.green { fill: #26ee69; }
+.routeDot.yellow { fill: #d4ef21; }
+.routeDot.orange { fill: #ff9d00; }
+.routeDot.red { fill: #ff3028; }
+
+.startRing {
+  fill: transparent;
+  stroke: #28ff75;
+  stroke-width: 1.2;
+  filter: url(#glow);
+}
+
+.endRing {
+  fill: transparent;
+  stroke: #ff3a32;
+  stroke-width: 1.2;
+  filter: url(#glow);
+}
+
+.mapLabel {
+  fill: #f3f3ed;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 2px;
+  font-weight: 900;
+}
+
+.mapLabel.start { fill: #28ff75; }
+.mapLabel.end { fill: #ff3a32; }
+
+.hudScore,
+.hudRiskLegend {
+  position: absolute;
+  border: 1px solid rgba(235, 235, 224, 0.2);
+  background: rgba(2, 9, 10, 0.74);
+  padding: 16px 18px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  text-transform: uppercase;
+}
+
+.hudScore {
+  left: 8%;
+  top: 8%;
+  min-width: 210px;
+}
+
+.hudScore span,
+.hudRiskLegend span {
+  display: block;
+  color: #a5aaa4;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+}
+
+.hudScore strong {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: #28ff75;
+  font-size: 3.1rem;
+  line-height: 1;
+}
+
+.hudScore small {
+  color: #9ba09b;
+  font-size: 1rem;
+}
+
+.hudScore em {
+  color: #28ff75;
+  font-style: normal;
+  margin-left: 14px;
+}
+
+.hudRiskLegend {
+  right: 2%;
+  top: 8%;
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 8px 10px;
+  min-width: 170px;
+  color: #aeb3ae;
+  font-size: 0.76rem;
+}
+
+.hudRiskLegend span {
+  grid-column: 1 / -1;
+}
+
+.hudRiskLegend i {
+  display: block;
+  height: 2px;
+  align-self: center;
+}
+
+.lowLine { background: #28ff75; }
+.mediumLine { background: #ffc400; }
+.highLine { background: #ff3028; }
+
+.hudWorkflow {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.9fr) minmax(230px, 0.8fr) minmax(360px, 1.55fr) minmax(230px, 0.85fr);
+  gap: 14px;
+  margin: 18px clamp(22px, 3.8vw, 54px) 0;
+}
+
+.hudCard {
+  min-width: 0;
+  border: 1px solid rgba(235, 235, 224, 0.16);
+  background: linear-gradient(140deg, rgba(7, 18, 20, 0.92), rgba(2, 7, 8, 0.96));
+  padding: 22px;
+}
+
+.hudCard header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  text-transform: uppercase;
+}
+
+.hudCard h2 {
+  font-size: 0.98rem;
+  letter-spacing: 0.06em;
+}
+
+.hudCard header span {
+  color: #7f8580;
+}
+
+.hudDropZone {
+  min-height: 122px;
+  border: 1px dashed rgba(235, 235, 224, 0.24);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  margin: 0 0 18px;
+  cursor: pointer;
+}
+
+.hudDropZone span {
+  color: #aeb3ae;
+}
+
+.hudDropZone input {
+  display: none;
+}
+
+.hudFileRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid rgba(235, 235, 224, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.hudFileRow strong,
+.hudFileRow span {
+  display: block;
+}
+
+.hudFileRow span,
+.hudProgress span {
+  color: #8d938e;
+  font-size: 0.82rem;
+}
+
+.hudProgress {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  overflow: hidden;
+}
+
+.hudProgress i {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  background: #ccff00;
+}
+
+.hudProcessStep {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #8d938e;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  margin: 0 0 18px;
+  text-transform: uppercase;
+}
+
+.hudProcessStep.done svg {
+  color: #25ef67;
+}
+
+.hudProcessStep.active svg {
+  color: #ccff00;
+}
+
+.processingProgress {
+  margin-top: 38px;
+}
+
+.hudFrame {
+  position: relative;
+  min-height: 186px;
+  border: 1px solid rgba(235, 235, 224, 0.14);
+  overflow: hidden;
+}
+
+.hudFrame img,
+.hudSyntheticFrame {
+  width: 100%;
+  height: 100%;
+  min-height: 186px;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.15) brightness(0.7);
+  background:
+    radial-gradient(circle at 82% 40%, rgba(255, 234, 180, 0.62), transparent 8px),
+    radial-gradient(circle at 55% 50%, rgba(255, 234, 180, 0.35), transparent 6px),
+    linear-gradient(145deg, rgba(14, 24, 30, 0.86), rgba(1, 5, 6, 0.96)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 18px, transparent 19px 48px);
+}
+
+.hudFrame > span {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  color: #aeb3ae;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.hudFrameStats {
+  display: grid;
+  grid-template-columns: auto auto auto 1fr;
+  gap: 12px 18px;
+  align-items: center;
+  margin-top: 12px;
+  color: #aeb3ae;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+}
+
+.riskHighText {
+  color: #ff3028;
+}
+
+.hudRiskTimeline {
+  height: 28px;
+  margin-top: 14px;
+  background: linear-gradient(90deg, #ff3028 0 18%, #ff9d00 18% 42%, #ffc400 42% 72%, #ff3028 72% 100%);
+  position: relative;
+}
+
+.hudRiskTimeline i {
+  position: absolute;
+  left: 58%;
+  top: -6px;
+  width: 3px;
+  height: 40px;
+  background: #f3f3ed;
+}
+
+.summaryRows {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0;
+  border: 1px solid rgba(235, 235, 224, 0.08);
+}
+
+.summaryRows span,
+.summaryRows strong {
+  padding: 14px;
+  border-bottom: 1px solid rgba(235, 235, 224, 0.08);
+}
+
+.summaryRows span {
+  color: #8d938e;
+  text-transform: uppercase;
+}
+
+.summaryScore {
+  margin: 24px 0;
+}
+
+.summaryScore span {
+  display: block;
+  color: #aeb3ae;
+  text-transform: uppercase;
+}
+
+.summaryScore strong {
+  color: #28ff75;
+  font-size: 2.3rem;
+}
+
+.summaryScore small {
+  color: #8d938e;
+  font-size: 1rem;
+}
+
+.summaryScore em {
+  color: #28ff75;
+  font-style: normal;
+  margin-left: 12px;
+  text-transform: uppercase;
+}
+
+.routeSummaryStage button {
+  width: 100%;
+  justify-content: space-between;
+  padding: 0 22px;
+}
+
+.hudFeatureStrip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin: 18px clamp(22px, 3.8vw, 54px) 0;
+  border: 1px solid rgba(235, 235, 224, 0.16);
+  background: rgba(2, 7, 8, 0.82);
+}
+
+.hudFeatureStrip article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 7px 18px;
+  padding: 22px 30px;
+  border-left: 1px solid rgba(235, 235, 224, 0.1);
+}
+
+.hudFeatureStrip article:first-child {
+  border-left: 0;
+}
+
+.hudFeatureStrip svg {
+  grid-row: span 2;
+  color: #8c9490;
+}
+
+.hudFeatureStrip strong {
+  color: #f3f3ed;
+  text-transform: uppercase;
+}
+
+.hudFeatureStrip span {
+  color: #9da39e;
+  line-height: 1.45;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #28ff75;
+  align-self: center;
+}
+
 @media (min-width: 1181px) {
   .mainColumn > .mappingPanel {
     min-height: min(720px, calc(100vh - 230px));
@@ -1234,6 +1807,40 @@ input[type="range"] {
 }
 
 @media (max-width: 1180px) {
+  .hudNav {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: 14px;
+    padding-block: 16px;
+  }
+
+  .hudNavLinks,
+  .hudNavActions {
+    justify-content: start;
+    flex-wrap: wrap;
+  }
+
+  .hudHero {
+    grid-template-columns: 1fr;
+  }
+
+  .hudMapStage,
+  .hudBlueprint {
+    min-height: 360px;
+  }
+
+  .hudWorkflow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .visualizationStage {
+    grid-column: span 2;
+  }
+
+  .hudFeatureStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .landingNav {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -1319,6 +1926,75 @@ input[type="range"] {
 @media (max-width: 720px) {
   main {
     background-size: 42px 42px;
+  }
+
+  .hudNav {
+    padding: 14px 18px;
+  }
+
+  .hudNavLinks {
+    display: none;
+  }
+
+  .hudNavActions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .hudHero {
+    margin: 0 18px;
+    padding: 28px 18px 18px;
+  }
+
+  .hudHeroCopy h1 {
+    font-size: clamp(3.3rem, 17vw, 4.8rem);
+  }
+
+  .hudHeroActions,
+  .hudWorkflow,
+  .hudFeatureStrip,
+  .hudFrameStats {
+    grid-template-columns: 1fr;
+  }
+
+  .hudHeroActions {
+    display: grid;
+  }
+
+  .hudHeroActions button,
+  .hudHeroActions .uploadButton {
+    width: 100%;
+  }
+
+  .hudScore,
+  .hudRiskLegend {
+    position: static;
+    margin-bottom: 12px;
+  }
+
+  .hudMapStage,
+  .hudBlueprint {
+    min-height: 310px;
+  }
+
+  .hudWorkflow,
+  .hudFeatureStrip {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+
+  .visualizationStage {
+    grid-column: auto;
+  }
+
+  .hudFeatureStrip article {
+    border-left: 0;
+    border-top: 1px solid rgba(235, 235, 224, 0.1);
+  }
+
+  .hudFeatureStrip article:first-child {
+    border-top: 0;
   }
 
   .landingNav {

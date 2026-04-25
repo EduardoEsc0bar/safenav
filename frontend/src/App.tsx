@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowRight, Bell, Building2, Camera, PlayCircle, Shield, Workflow } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Circle, Crosshair, Shield, Upload, X, Zap } from "lucide-react";
 import { api } from "./api/client";
 import { CampusMap } from "./components/CampusMap";
 import { MetricsPanel } from "./components/MetricsPanel";
@@ -8,7 +8,6 @@ import { RiskDashboard } from "./components/RiskDashboard";
 import { RouteControls } from "./components/RouteControls";
 import { RouteExplanation } from "./components/RouteExplanation";
 import { SimulationPanel } from "./components/SimulationPanel";
-import { VisualMappingPanel } from "./components/VisualMappingPanel";
 import type { Algorithm, CampusGraph, PerceptionFeatures, RouteResult, RuntimeMetrics, SlamLiteResult, SummaryMetrics } from "./types";
 
 const initialGraph: CampusGraph = { nodes: [], edges: [] };
@@ -33,6 +32,10 @@ export default function App() {
   const [error, setError] = useState("");
 
   const selectedNode = useMemo(() => graph.nodes.find((node) => node.id === selectedNodeId) ?? null, [graph.nodes, selectedNodeId]);
+  const safetyScore = summary ? Math.max(0, 10 - summary.overall_risk * 10) : 8.7;
+  const safetyLabel = safetyScore >= 7.5 ? "High" : safetyScore >= 5 ? "Moderate" : "Low";
+  const firstKeyframe = slamResult?.keyframeInstances?.[0] ?? null;
+  const uploadProgress = slamProcessing ? 78 : slamResult ? 100 : 0;
 
   const loadGraph = useCallback(async () => {
     const response = await api.getGraph() as { graph: CampusGraph; summary: SummaryMetrics };
@@ -204,106 +207,133 @@ export default function App() {
 
   return (
     <main>
-      <header className="landingNav">
-        <div className="navBrand">
-          <div className="brandLine">
-            <Shield size={27} />
-            <span>SafeNav</span>
-          </div>
+      <header className="hudNav">
+        <div className="hudBrand">
+          <Crosshair size={28} />
+          <span>SAFENAV</span>
         </div>
-        <nav className="topnav" aria-label="SafeNav sections">
-          <span>How It Works</span>
-          <span>Campus Safety</span>
-          <span>Visual Mapping</span>
-          <span>About</span>
-          <span>Contact</span>
+        <nav className="hudNavLinks" aria-label="SafeNav sections">
+          <span>Platform</span>
+          <span>Technology</span>
+          <span>Solutions</span>
+          <span>Resources</span>
+          <span>Company</span>
         </nav>
-        <div className="navActions">
-          <button type="button" onClick={computeRoute}>Find Route</button>
-          <button className="primary" type="button" onClick={runSlamDemo}>Get Started</button>
+        <div className="hudNavActions">
+          <button type="button" onClick={computeRoute}>Log In</button>
+          <button className="hudAccentButton" type="button" onClick={runSlamDemo}>Get Started <ArrowUpRight size={16} /></button>
         </div>
       </header>
 
       {error && <div className="errorBanner">{error}</div>}
 
-      <section className="heroShell">
-        <div className="heroCopy">
-          <h1>Your safest path home.</h1>
-          <p>
-            SafeNav fuses camera-based visual mapping, perception signals, and risk-aware path planning to guide students through safer campus routes after dark.
-          </p>
-          <div className="heroActions">
-            <button className="primary" type="button" onClick={computeRoute}>
-              <span>Find Your Safe Route</span>
-              <ArrowRight size={17} />
-            </button>
-            <button type="button" onClick={runSlamDemo}>
-              <span>See How It Works</span>
-              <PlayCircle size={17} />
-            </button>
+      <section className="hudHero">
+        <div className="hudHeroCopy">
+          <p className="hudStep"><strong>01</strong> / Analyze Environment</p>
+          <h1>Visual Mapping Mode</h1>
+          <p>Upload footage. We map the environment, analyze risk in every frame, and build the safest route.</p>
+          <div className="hudHeroActions">
+            <label className="hudAccentButton uploadButton" title="Upload campus walk video">
+              <span>Upload Video</span>
+              <Upload size={17} />
+              <input
+                type="file"
+                accept="video/*,.mov,.mp4,.mkv"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  event.currentTarget.value = "";
+                  if (file) uploadSlamVideo(file);
+                }}
+              />
+            </label>
+            <button type="button" onClick={runSlamDemo}>View Demo Map <ArrowUpRight size={17} /></button>
           </div>
+          <span className="hudFormats">Supported formats<br />MP4, MOV, MKV</span>
         </div>
-        <aside className="heroCard">
-          <div className="brandLine">
-            <Shield size={20} />
-            <span>SafeNav</span>
-          </div>
-          <h2>Safety first, always.</h2>
-          <p>Travel with confidence using perception-aware visual odometry, live risk scoring, and route replanning.</p>
-          <button type="button" onClick={runSlamDemo}>Learn more <ArrowRight size={16} /></button>
-        </aside>
 
-        <section className="demoConsole">
-          <div className="consolePlanner">
-            <RouteControls
-              nodes={graph.nodes}
-              startId={startId}
-              endId={endId}
-              algorithm={algorithm}
-              riskWeight={riskWeight}
-              onStartChange={setStartId}
-              onEndChange={setEndId}
-              onAlgorithmChange={setAlgorithm}
-              onRiskWeightChange={setRiskWeight}
-              onCompute={computeRoute}
-            />
+        <div className="hudMapStage">
+          <div className="hudScore">
+            <span>Safety Score</span>
+            <strong>{safetyScore.toFixed(1)}<small>/10</small></strong>
+            <em>{safetyLabel}</em>
           </div>
-          <div className="consoleMapping">
-            <VisualMappingPanel
-              slam={slamResult}
-              isProcessing={slamProcessing}
-              status={slamStatus}
-              uploadedFileName={slamFileName}
-              onUpload={uploadSlamVideo}
-              onDemo={runSlamDemo}
-            />
+          <div className="hudRiskLegend">
+            <span>Risk Level</span>
+            <i className="lowLine" /> Low Risk
+            <i className="mediumLine" /> Moderate
+            <i className="highLine" /> High Risk
           </div>
-          <aside className="liveFeedCard">
-            <div className="sectionHeader">
-              <div>
-                <p className="eyebrow">Live Camera Feed</p>
-                <h2>Route Context</h2>
-              </div>
-              <Camera size={18} />
-            </div>
-            <div className="cameraPreview">
-              <span className="livePill">Live</span>
-            </div>
-            <div className="feedRows">
-              <span>Location</span><strong>{selectedNode?.name ?? "Library Pathway"}</strong>
-              <span>Foot Traffic</span><strong>Moderate</strong>
-              <span>Lighting</span><strong>Good</strong>
-              <span>Recent Activity</span><strong>Low Risk</strong>
-            </div>
-          </aside>
-        </section>
+          <HudRouteBlueprint />
+        </div>
       </section>
 
-      <section className="featureRail" aria-label="SafeNav technical highlights">
-        <article><Shield size={30} /><strong>Real-Time Safety</strong><span>Perception signals update route risk as conditions change.</span></article>
-        <article><Workflow size={30} /><strong>Smart Routing</strong><span>Dijkstra and A* compare risk-aware paths over the campus graph.</span></article>
-        <article><Bell size={30} /><strong>Alerts & Reroutes</strong><span>Blocked paths and low visibility trigger route recalculation.</span></article>
-        <article><Building2 size={30} /><strong>For Campuses</strong><span>A hackathon-ready autonomy demo for nighttime navigation.</span></article>
+      <section className="hudWorkflow">
+        <article className="hudCard uploadStage">
+          <header><h2>1. Upload Video</h2><span>01</span></header>
+          <label className="hudDropZone">
+            <Upload size={28} />
+            <strong>Drag & Drop Video</strong>
+            <span>or click to browse</span>
+            <input
+              type="file"
+              accept="video/*,.mov,.mp4,.mkv"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                event.currentTarget.value = "";
+                if (file) uploadSlamVideo(file);
+              }}
+            />
+          </label>
+          <div className="hudFileRow">
+            <div><strong>{slamFileName || "Campus_walk_0324.mp4"}</strong><span>{slamFileName ? "Uploaded video" : "04:12 1080p"}</span></div>
+            <X size={17} />
+          </div>
+          <div className="hudProgress"><span>Uploaded</span><strong>{uploadProgress}%</strong><i style={{ width: `${uploadProgress}%` }} /></div>
+        </article>
+
+        <article className="hudCard processingStage">
+          <header><h2>2. Processing</h2><span>02</span></header>
+          <HudProcessStep done label="Extracting frames" />
+          <HudProcessStep done={Boolean(slamResult)} label="Analyzing environment" />
+          <HudProcessStep done={Boolean(firstKeyframe)} label="Detecting objects" />
+          <HudProcessStep active={slamProcessing} done={Boolean(slamResult)} label="Calculating risk" />
+          <HudProcessStep done={Boolean(route)} label="Generating routes" />
+          <div className="hudProgress processingProgress"><strong>{slamProcessing ? "78%" : slamResult ? "100%" : "Ready"}</strong><i style={{ width: `${slamProcessing ? 78 : slamResult ? 100 : 18}%` }} /></div>
+        </article>
+
+        <article className="hudCard visualizationStage">
+          <header><h2>3. Visualization</h2><span>03</span></header>
+          <div className="hudFrame">
+            {firstKeyframe?.imageDataUrl ? <img src={firstKeyframe.imageDataUrl} alt={`${firstKeyframe.title} visual analysis`} /> : <div className="hudSyntheticFrame" />}
+            <span>Frame {firstKeyframe?.index ?? 1420} / {slamResult?.framesProcessed ?? 7621} &nbsp; 00:02:13</span>
+          </div>
+          <div className="hudFrameStats">
+            <span>Objects detected</span><strong>{firstKeyframe?.keypoints ?? 14}</strong>
+            <span>Risk level</span><strong className={safetyScore >= 7.5 ? "riskHighText" : ""}>{safetyLabel}</strong>
+          </div>
+          <div className="hudRiskTimeline"><i /></div>
+        </article>
+
+        <article className="hudCard routeSummaryStage">
+          <header><h2>Route Summary</h2><span>04</span></header>
+          <div className="summaryRows">
+            <span>Distance</span><strong>{route ? `${(route.totalDistance / 100).toFixed(2)} mi` : "0.72 mi"}</strong>
+            <span>Est. Time</span><strong>{route ? `${Math.max(6, Math.round(route.totalDistance / 5))} min` : "14 min"}</strong>
+          </div>
+          <div className="summaryScore">
+            <span>Safety Score</span>
+            <strong>{safetyScore.toFixed(1)}<small>/10</small></strong>
+            <em>{safetyLabel}</em>
+          </div>
+          <button type="button" onClick={computeRoute}>View Safe Route <ArrowUpRight size={17} /></button>
+        </article>
+      </section>
+
+      <section className="hudFeatureStrip" aria-label="SafeNav technical highlights">
+        <article><Crosshair size={32} /><strong>Real-Time Intelligence</strong><span>Camera data and models continuously update risk levels.</span></article>
+        <article><Zap size={32} /><strong>Adaptive Routing</strong><span>Routes adjust in real time based on changing conditions.</span></article>
+        <article><Shield size={32} /><strong>Privacy First</strong><span>Demo-ready perception signals without identity claims.</span></article>
+        <article><span className="statusDot" /><strong>System Status</strong><span>Operational</span></article>
       </section>
 
       <div className="appGrid">
@@ -326,6 +356,18 @@ export default function App() {
           />
         </div>
         <aside className="sideColumn">
+          <RouteControls
+            nodes={graph.nodes}
+            startId={startId}
+            endId={endId}
+            algorithm={algorithm}
+            riskWeight={riskWeight}
+            onStartChange={setStartId}
+            onEndChange={setEndId}
+            onAlgorithmChange={setAlgorithm}
+            onRiskWeightChange={setRiskWeight}
+            onCompute={computeRoute}
+          />
           <SimulationPanel onSimulate={simulate} onReset={reset} />
           <PerceptionPanel
             nodes={graph.nodes}
@@ -343,5 +385,48 @@ export default function App() {
         </aside>
       </div>
     </main>
+  );
+}
+
+function HudProcessStep({ label, done, active }: { label: string; done?: boolean; active?: boolean }) {
+  return (
+    <div className={`hudProcessStep ${done ? "done" : ""} ${active ? "active" : ""}`}>
+      {done ? <CheckCircle2 size={18} /> : <Circle size={18} />}
+      <span>{label}</span>
+    </div>
+  );
+}
+
+function HudRouteBlueprint() {
+  const dots = [
+    [23, 48, "green"], [27, 49, "green"], [31, 50, "green"], [35, 52, "green"], [39, 55, "green"],
+    [44, 59, "yellow"], [49, 59, "yellow"], [54, 58, "yellow"], [59, 57, "yellow"], [64, 57, "yellow"],
+    [69, 55, "orange"], [73, 53, "orange"], [77, 52, "orange"], [81, 54, "red"], [84, 59, "red"],
+    [86, 65, "red"], [89, 71, "red"], [92, 76, "red"]
+  ];
+
+  return (
+    <svg className="hudBlueprint" viewBox="0 0 100 100" role="img" aria-label="SafeNav risk-colored route blueprint">
+      <defs>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2.4" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      {Array.from({ length: 30 }).map((_, index) => (
+        <rect key={index} x={8 + (index % 10) * 9} y={10 + Math.floor(index / 10) * 20} width="5.5" height="8" className="wireBuilding" />
+      ))}
+      <polyline points="23,48 31,50 39,55 44,59 54,58 64,57 73,53 81,54 86,65 92,76" className="routeGlow" />
+      {dots.map(([x, y, color], index) => <circle key={`${x}-${y}-${index}`} cx={x} cy={y} r="1.25" className={`routeDot ${color}`} />)}
+      <circle cx="21" cy="47" r="3.4" className="startRing" />
+      <text x="18" y="55" className="mapLabel start">START</text>
+      <text x="18" y="59" className="mapLabel">STUDENT CENTER</text>
+      <circle cx="92" cy="76" r="3.4" className="endRing" />
+      <text x="90" y="85" className="mapLabel end">END</text>
+      <text x="90" y="89" className="mapLabel">DORMS</text>
+    </svg>
   );
 }
