@@ -128,7 +128,7 @@ function MappingViz({ slam }: { slam: SlamLiteResult | null }) {
   );
 }
 
-function KeyframeInstances({ instances }: { instances: KeyframeInstance[] }) {
+export function KeyframeInstances({ instances }: { instances: KeyframeInstance[] }) {
   const [selectedInstance, setSelectedInstance] = useState<KeyframeInstance | null>(null);
 
   if (instances.length === 0) {

@@ -1679,6 +1679,30 @@ input[type="range"] {
   background: #f3f3ed;
 }
 
+.visualizationStage .instanceStrip {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.visualizationStage .instanceHeader {
+  grid-column: 1 / -1;
+}
+
+.visualizationStage .instanceCard {
+  background: rgba(0, 0, 0, 0.48);
+}
+
+.visualizationStage .instanceBody {
+  padding: 10px;
+}
+
+.visualizationStage .instanceDecision {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .summaryRows {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -1954,7 +1978,8 @@ input[type="range"] {
   .hudHeroActions,
   .hudWorkflow,
   .hudFeatureStrip,
-  .hudFrameStats {
+  .hudFrameStats,
+  .visualizationStage .instanceStrip {
     grid-template-columns: 1fr;
   }
 

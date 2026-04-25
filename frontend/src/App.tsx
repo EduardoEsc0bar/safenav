@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight, CheckCircle2, Circle, Crosshair, Shield, Upload, X, Zap } from "lucide-react";
 import { api } from "./api/client";
 import { CampusMap } from "./components/CampusMap";
@@ -8,6 +8,7 @@ import { RiskDashboard } from "./components/RiskDashboard";
 import { RouteControls } from "./components/RouteControls";
 import { RouteExplanation } from "./components/RouteExplanation";
 import { SimulationPanel } from "./components/SimulationPanel";
+import { KeyframeInstances } from "./components/VisualMappingPanel";
 import type { Algorithm, CampusGraph, PerceptionFeatures, RouteResult, RuntimeMetrics, SlamLiteResult, SummaryMetrics } from "./types";
 
 const initialGraph: CampusGraph = { nodes: [], edges: [] };
@@ -30,12 +31,19 @@ export default function App() {
   const [slamFileName, setSlamFileName] = useState("");
   const [liveMode, setLiveMode] = useState(false);
   const [error, setError] = useState("");
+  const workflowRef = useRef<HTMLElement | null>(null);
 
   const selectedNode = useMemo(() => graph.nodes.find((node) => node.id === selectedNodeId) ?? null, [graph.nodes, selectedNodeId]);
   const safetyScore = summary ? Math.max(0, 10 - summary.overall_risk * 10) : 8.7;
   const safetyLabel = safetyScore >= 7.5 ? "High" : safetyScore >= 5 ? "Moderate" : "Low";
   const firstKeyframe = slamResult?.keyframeInstances?.[0] ?? null;
   const uploadProgress = slamProcessing ? 78 : slamResult ? 100 : 0;
+
+  const scrollToWorkflow = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      workflowRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, []);
 
   const loadGraph = useCallback(async () => {
     const response = await api.getGraph() as { graph: CampusGraph; summary: SummaryMetrics };
@@ -181,6 +189,7 @@ export default function App() {
     setSlamProcessing(true);
     setSlamFileName(`${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`);
     setSlamStatus("Uploading video to SLAM-lite backend");
+    scrollToWorkflow();
     try {
       const response = await api.slamUploadVideo(file, selectedNodeId) as {
         slam: SlamLiteResult;
@@ -267,7 +276,7 @@ export default function App() {
         </div>
       </section>
 
-      <section className="hudWorkflow">
+      <section className="hudWorkflow" ref={workflowRef}>
         <article className="hudCard uploadStage">
           <header><h2>1. Upload Video</h2><span>01</span></header>
           <label className="hudDropZone">
@@ -312,6 +321,7 @@ export default function App() {
             <span>Risk level</span><strong className={safetyScore >= 7.5 ? "riskHighText" : ""}>{safetyLabel}</strong>
           </div>
           <div className="hudRiskTimeline"><i /></div>
+          <KeyframeInstances instances={slamResult?.keyframeInstances ?? []} />
         </article>
 
         <article className="hudCard routeSummaryStage">
