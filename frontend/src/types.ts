@@ -122,7 +122,7 @@ export interface KeyframeInstance {
   matchesToNext: number;
   inliersToNext: number;
   decision: string;
-  sceneSafety: SceneSafety;
+  sceneSafety?: SceneSafety;
 }
 
 export interface SceneSafety {

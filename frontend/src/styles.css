@@ -613,6 +613,136 @@ select {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.keyframeModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(9, 15, 12, 0.64);
+}
+
+.keyframeModal {
+  width: min(1180px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  border: 1px solid #d4dfd8;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 24px 80px rgba(5, 10, 7, 0.35);
+  padding: 16px;
+}
+
+.keyframeModalHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.keyframeModalHeader h3 {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.35rem);
+  line-height: 1.05;
+}
+
+.keyframeModalGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.keyframePreviewPane {
+  display: grid;
+  gap: 12px;
+}
+
+.keyframePreviewPane img,
+.keyframePreviewPane .instancePlaceholder {
+  width: 100%;
+  max-height: calc(100vh - 220px);
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  border: 1px solid #d9e3dd;
+  border-radius: 8px;
+  background: #101612;
+}
+
+.riskCallout {
+  display: grid;
+  gap: 5px;
+  border: 1px solid #ead39d;
+  border-radius: 8px;
+  background: #fff8e8;
+  color: #5f4612;
+  padding: 12px;
+}
+
+.riskCallout strong {
+  font-size: 1rem;
+  text-transform: capitalize;
+}
+
+.riskCallout span {
+  color: #66553b;
+  line-height: 1.4;
+}
+
+.riskCallout.low {
+  border-color: #b9dfc4;
+  background: #f0fbf3;
+  color: #155a39;
+}
+
+.riskCallout.low span {
+  color: #375344;
+}
+
+.riskCallout.high,
+.riskCallout.critical {
+  border-color: #e3b7b2;
+  background: #fff4f2;
+  color: #7e251d;
+}
+
+.riskCallout.high span,
+.riskCallout.critical span {
+  color: #6a443f;
+}
+
+.keyframeDetailPane {
+  display: grid;
+  gap: 14px;
+}
+
+.keyframeDetailPane section {
+  border: 1px solid #e0e7e2;
+  border-radius: 8px;
+  background: #fbfdfb;
+  padding: 12px;
+}
+
+.keyframeDetailPane h4 {
+  margin: 0 0 10px;
+  color: #3f4f45;
+  font-size: 0.88rem;
+  text-transform: uppercase;
+}
+
+.reasoningBlock {
+  display: grid;
+  gap: 10px;
+}
+
+.reasoningBlock p {
+  margin: 0;
+  color: #47584e;
+  line-height: 1.52;
+}
+
 .metric {
   border: 1px solid #e0e7e2;
   border-radius: 7px;
@@ -706,6 +836,15 @@ select {
   .sceneGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .keyframeModalGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .keyframePreviewPane img,
+  .keyframePreviewPane .instancePlaceholder {
+    max-height: 48vh;
+  }
 }
 
 @media (max-width: 720px) {
@@ -745,5 +884,24 @@ select {
   .campusMap {
     min-height: 390px;
     height: 55vh;
+  }
+
+  .keyframeModalBackdrop {
+    padding: 10px;
+  }
+
+  .keyframeModal {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+    padding: 12px;
+  }
+
+  .keyframeModalGrid {
+    gap: 12px;
+  }
+
+  .keyframePreviewPane img,
+  .keyframePreviewPane .instancePlaceholder {
+    max-height: 42vh;
   }
 }

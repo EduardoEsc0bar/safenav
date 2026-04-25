@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Box, Upload, Wand2 } from "lucide-react";
-import type { KeyframeInstance, SlamLiteResult } from "../types";
+import { Box, X, Upload, Wand2 } from "lucide-react";
+import type { KeyframeInstance, SceneSafety, SlamLiteResult } from "../types";
 
 export function VisualMappingPanel({
   slam,
@@ -171,55 +171,99 @@ function KeyframeInstances({ instances }: { instances: KeyframeInstance[] }) {
           </button>
         ))}
       </div>
-      {selectedInstance && <KeyframeInspection instance={selectedInstance} />}
+      {selectedInstance && <KeyframeInspectionModal instance={selectedInstance} onClose={() => setSelectedInstance(null)} />}
     </>
   );
 }
 
-function KeyframeInspection({ instance }: { instance: KeyframeInstance }) {
+function KeyframeInspectionModal({ instance, onClose }: { instance: KeyframeInstance; onClose: () => void }) {
+  const inspection = getInspectionModel(instance);
+  const scene = instance.sceneSafety ?? defaultSceneSafety();
+
+  return (
+    <div className="keyframeModalBackdrop" role="presentation" onClick={onClose}>
+      <div className="keyframeModal" role="dialog" aria-modal="true" aria-label={`${instance.title} inspection`} onClick={(event) => event.stopPropagation()}>
+        <div className="keyframeModalHeader">
+          <div>
+            <p className="eyebrow">Keyframe Inspection</p>
+            <h3>{instance.title}</h3>
+          </div>
+          <button className="iconButton" onClick={onClose} title="Close keyframe inspection" type="button">
+            <X size={18} />
+          </button>
+        </div>
+        <div className="keyframeModalGrid">
+          <div className="keyframePreviewPane">
+            {instance.imageDataUrl ? (
+              <img src={instance.imageDataUrl} alt={`${instance.title} with ORB keypoints`} />
+            ) : (
+              <div className="instancePlaceholder">Demo instance</div>
+            )}
+            <div className={`riskCallout ${scene.sceneRiskCategory}`}>
+              <strong>Scene Risk: {scene.sceneRiskCategory} ({scene.sceneRiskScore.toFixed(2)})</strong>
+              <span>{scene.safetySummary}</span>
+            </div>
+          </div>
+          <div className="keyframeDetailPane">
+            <section>
+              <h4>What SafeNav Sees</h4>
+              <div className="inspectionGrid">
+                <Metric label="Feature quality" value={inspection.featureQuality} />
+                <Metric label="Geometry quality" value={inspection.geometryQuality} />
+                <Metric label="Inlier ratio" value={`${Math.round(inspection.matchSupport * 100)}%`} />
+                <Metric label="Pose signal" value={instance.inliersToNext >= 25 ? "accepted" : "uncertain"} />
+              </div>
+            </section>
+            <section>
+              <h4>Scene Risk Signals</h4>
+              <div className="inspectionGrid sceneGrid">
+                <Metric label="Lighting" value={scene.lightingScore.toFixed(2)} />
+                <Metric label="Visibility" value={scene.visibilityScore.toFixed(2)} />
+                <Metric label="Obstruction" value={scene.obstructionScore.toFixed(2)} />
+                <Metric label="Motion" value={scene.motionScore.toFixed(2)} />
+                <Metric label="Pedestrian proxy" value={scene.crowdScore.toFixed(2)} />
+                <Metric label="Risk score" value={scene.sceneRiskScore.toFixed(2)} />
+              </div>
+            </section>
+            <section className="reasoningBlock">
+              <h4>Why SafeNav Thinks This Risk Is {scene.sceneRiskCategory}</h4>
+              <p>{scene.sceneRiskExplanation}</p>
+              <p>{inspection.safetySignal}</p>
+              <p>{inspection.geometryExplanation}</p>
+              <p>Decision: {instance.decision}</p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getInspectionModel(instance: KeyframeInstance) {
   const matchSupport = instance.matchesToNext > 0 ? instance.inliersToNext / instance.matchesToNext : 0;
   const featureQuality = instance.keypoints >= 900 ? "high" : instance.keypoints >= 450 ? "moderate" : "low";
   const geometryQuality = matchSupport >= 0.45 ? "strong" : matchSupport >= 0.2 ? "usable" : "weak";
-  const scene = instance.sceneSafety;
   const safetySignal =
     geometryQuality === "strong"
       ? "Mapping confidence is strong here, so SafeNav can trust the local camera motion estimate and avoid adding uncertainty-based risk."
       : geometryQuality === "usable"
         ? "Mapping confidence is usable but not perfect, so SafeNav treats this area as observable while still watching for uncertainty."
         : "Mapping confidence is weak here, so SafeNav treats this segment as more uncertain and may increase visibility or obstruction risk.";
+  const geometryExplanation = "ORB keypoints measure visible texture and corners. Matches connect this frame to the next sampled view. RANSAC inliers are the matches that agree with one camera-motion model, which is why they drive pose reliability.";
 
-  return (
-    <div className="inspectionPanel">
-      <div>
-        <p className="eyebrow">Keyframe Inspection</p>
-        <h3>{instance.title}</h3>
-      </div>
-      <div className="inspectionGrid">
-        <Metric label="Feature quality" value={featureQuality} />
-        <Metric label="Geometry quality" value={geometryQuality} />
-        <Metric label="Inlier ratio" value={`${Math.round(matchSupport * 100)}%`} />
-        <Metric label="Pose signal" value={instance.inliersToNext >= 25 ? "accepted" : "uncertain"} />
-      </div>
-      <div className="inspectionGrid sceneGrid">
-        <Metric label="Scene risk" value={`${scene.sceneRiskCategory} (${scene.sceneRiskScore.toFixed(2)})`} />
-        <Metric label="Lighting" value={scene.lightingScore.toFixed(2)} />
-        <Metric label="Visibility" value={scene.visibilityScore.toFixed(2)} />
-        <Metric label="Obstruction" value={scene.obstructionScore.toFixed(2)} />
-        <Metric label="Motion" value={scene.motionScore.toFixed(2)} />
-        <Metric label="Pedestrian proxy" value={scene.crowdScore.toFixed(2)} />
-      </div>
-      <p>
-        This frame tells SafeNav how much visual structure was available at this moment in the video. ORB keypoints measure visible texture and corners, matches connect this frame to the next sampled view, and RANSAC inliers are the matches that agree with one camera-motion model.
-      </p>
-      <p>
-        Scene-risk proxy: {scene.safetySummary} {scene.sceneRiskExplanation}
-      </p>
-      <p>
-        {safetySignal}
-      </p>
-      <p>
-        Decision: {instance.decision}
-      </p>
-    </div>
-  );
+  return { matchSupport, featureQuality, geometryQuality, safetySignal, geometryExplanation };
+}
+
+function defaultSceneSafety(): SceneSafety {
+  return {
+    lightingScore: 0.5,
+    visibilityScore: 0.5,
+    motionScore: 0.0,
+    crowdScore: 0.5,
+    obstructionScore: 0.2,
+    sceneRiskScore: 0.35,
+    sceneRiskCategory: "medium",
+    sceneRiskExplanation: "This keyframe does not include scene-risk fields, so SafeNav treats it as moderate uncertainty instead of overclaiming safety.",
+    safetySummary: "Scene-risk proxy is unavailable for this keyframe; SafeNav keeps a conservative medium-risk interpretation."
+  };
 }
