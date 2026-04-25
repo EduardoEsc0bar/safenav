@@ -204,10 +204,20 @@ export default function App() {
   return (
     <main>
       <header className="topbar">
-        <div>
+        <div className="brandBlock">
+          <div className="brandLine">
+            <span className="brandMark" aria-hidden="true">△</span>
+            <span>SafeNav</span>
+          </div>
           <p className="eyebrow">SLAM-lite visual odometry + risk-aware routing</p>
-          <h1>SafeNav</h1>
+          <h1>Campus Autonomy Stack</h1>
         </div>
+        <nav className="topnav" aria-label="SafeNav system sections">
+          <span>Mapping</span>
+          <span>Planning</span>
+          <span>Perception</span>
+          <span>Risk</span>
+        </nav>
         <div className="headerStats">
           <span>Nodes <strong>{graph.nodes.length}</strong></span>
           <span>Edges <strong>{graph.edges.length}</strong></span>
