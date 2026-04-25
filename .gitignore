@@ -1,0 +1,9 @@
+backend/.venv/
+frontend/node_modules/
+frontend/dist/
+frontend/*.js
+frontend/*.d.ts
+*.tsbuildinfo
+__pycache__/
+*.py[cod]
+.DS_Store
