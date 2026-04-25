@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { ArrowRight, Bell, Building2, Camera, PlayCircle, Shield, Workflow } from "lucide-react";
 import { api } from "./api/client";
 import { CampusMap } from "./components/CampusMap";
 import { MetricsPanel } from "./components/MetricsPanel";
@@ -203,41 +204,110 @@ export default function App() {
 
   return (
     <main>
-      <header className="topbar">
-        <div className="brandBlock">
+      <header className="landingNav">
+        <div className="navBrand">
           <div className="brandLine">
-            <span className="brandMark" aria-hidden="true">△</span>
+            <Shield size={27} />
             <span>SafeNav</span>
           </div>
-          <p className="eyebrow">SLAM-lite visual odometry + risk-aware routing</p>
-          <h1>Campus Autonomy Stack</h1>
         </div>
-        <nav className="topnav" aria-label="SafeNav system sections">
-          <span>Mapping</span>
-          <span>Planning</span>
-          <span>Perception</span>
-          <span>Risk</span>
+        <nav className="topnav" aria-label="SafeNav sections">
+          <span>How It Works</span>
+          <span>Campus Safety</span>
+          <span>Visual Mapping</span>
+          <span>About</span>
+          <span>Contact</span>
         </nav>
-        <div className="headerStats">
-          <span>Nodes <strong>{graph.nodes.length}</strong></span>
-          <span>Edges <strong>{graph.edges.length}</strong></span>
-          <span>Risk <strong>{summary?.overall_risk.toFixed(2) ?? "-"}</strong></span>
-          <span>Map <strong>{metrics?.map_confidence != null ? metrics.map_confidence.toFixed(2) : "-"}</strong></span>
+        <div className="navActions">
+          <button type="button" onClick={computeRoute}>Find Route</button>
+          <button className="primary" type="button" onClick={runSlamDemo}>Get Started</button>
         </div>
       </header>
 
       {error && <div className="errorBanner">{error}</div>}
 
+      <section className="heroShell">
+        <div className="heroCopy">
+          <h1>Your safest path home.</h1>
+          <p>
+            SafeNav fuses camera-based visual mapping, perception signals, and risk-aware path planning to guide students through safer campus routes after dark.
+          </p>
+          <div className="heroActions">
+            <button className="primary" type="button" onClick={computeRoute}>
+              <span>Find Your Safe Route</span>
+              <ArrowRight size={17} />
+            </button>
+            <button type="button" onClick={runSlamDemo}>
+              <span>See How It Works</span>
+              <PlayCircle size={17} />
+            </button>
+          </div>
+        </div>
+        <aside className="heroCard">
+          <div className="brandLine">
+            <Shield size={20} />
+            <span>SafeNav</span>
+          </div>
+          <h2>Safety first, always.</h2>
+          <p>Travel with confidence using perception-aware visual odometry, live risk scoring, and route replanning.</p>
+          <button type="button" onClick={runSlamDemo}>Learn more <ArrowRight size={16} /></button>
+        </aside>
+
+        <section className="demoConsole">
+          <div className="consolePlanner">
+            <RouteControls
+              nodes={graph.nodes}
+              startId={startId}
+              endId={endId}
+              algorithm={algorithm}
+              riskWeight={riskWeight}
+              onStartChange={setStartId}
+              onEndChange={setEndId}
+              onAlgorithmChange={setAlgorithm}
+              onRiskWeightChange={setRiskWeight}
+              onCompute={computeRoute}
+            />
+          </div>
+          <div className="consoleMapping">
+            <VisualMappingPanel
+              slam={slamResult}
+              isProcessing={slamProcessing}
+              status={slamStatus}
+              uploadedFileName={slamFileName}
+              onUpload={uploadSlamVideo}
+              onDemo={runSlamDemo}
+            />
+          </div>
+          <aside className="liveFeedCard">
+            <div className="sectionHeader">
+              <div>
+                <p className="eyebrow">Live Camera Feed</p>
+                <h2>Route Context</h2>
+              </div>
+              <Camera size={18} />
+            </div>
+            <div className="cameraPreview">
+              <span className="livePill">Live</span>
+            </div>
+            <div className="feedRows">
+              <span>Location</span><strong>{selectedNode?.name ?? "Library Pathway"}</strong>
+              <span>Foot Traffic</span><strong>Moderate</strong>
+              <span>Lighting</span><strong>Good</strong>
+              <span>Recent Activity</span><strong>Low Risk</strong>
+            </div>
+          </aside>
+        </section>
+      </section>
+
+      <section className="featureRail" aria-label="SafeNav technical highlights">
+        <article><Shield size={30} /><strong>Real-Time Safety</strong><span>Perception signals update route risk as conditions change.</span></article>
+        <article><Workflow size={30} /><strong>Smart Routing</strong><span>Dijkstra and A* compare risk-aware paths over the campus graph.</span></article>
+        <article><Bell size={30} /><strong>Alerts & Reroutes</strong><span>Blocked paths and low visibility trigger route recalculation.</span></article>
+        <article><Building2 size={30} /><strong>For Campuses</strong><span>A hackathon-ready autonomy demo for nighttime navigation.</span></article>
+      </section>
+
       <div className="appGrid">
         <div className="mainColumn">
-          <VisualMappingPanel
-            slam={slamResult}
-            isProcessing={slamProcessing}
-            status={slamStatus}
-            uploadedFileName={slamFileName}
-            onUpload={uploadSlamVideo}
-            onDemo={runSlamDemo}
-          />
           <CampusMap
             graph={graph}
             route={route}
@@ -256,18 +326,6 @@ export default function App() {
           />
         </div>
         <aside className="sideColumn">
-          <RouteControls
-            nodes={graph.nodes}
-            startId={startId}
-            endId={endId}
-            algorithm={algorithm}
-            riskWeight={riskWeight}
-            onStartChange={setStartId}
-            onEndChange={setEndId}
-            onAlgorithmChange={setAlgorithm}
-            onRiskWeightChange={setRiskWeight}
-            onCompute={computeRoute}
-          />
           <SimulationPanel onSimulate={simulate} onReset={reset} />
           <PerceptionPanel
             nodes={graph.nodes}
