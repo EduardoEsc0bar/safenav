@@ -1,10 +1,10 @@
 # SafeNav
 
-SafeNav is a perception-aware, risk-aware campus navigation prototype. It treats nighttime walking navigation like a small autonomy pipeline:
+SafeNav is a SLAM-lite visual mapping and perception-aware campus navigation prototype. It treats nighttime walking navigation like a small autonomy pipeline:
 
 Camera or simulated sensor input -> perception feature extraction -> risk estimation -> graph world model -> Dijkstra/A* path planning -> live visualization and metrics.
 
-The system also includes a SLAM-lite visual odometry and sparse mapping demo for uploaded iPhone videos. It uses ORB features, descriptor matching, essential matrix estimation, pose recovery, and sparse triangulation to produce a camera trajectory and point cloud. This is not production SLAM.
+The first screen centers the SLAM-lite visual odometry and sparse mapping demo for uploaded iPhone videos. It uses ORB features, descriptor matching, essential matrix estimation, pose recovery, and sparse triangulation to produce a camera trajectory, point cloud, and annotated keyframe evidence cards. This is not production SLAM.
 
 ## Project Structure
 

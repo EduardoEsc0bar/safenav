@@ -205,7 +205,7 @@ export default function App() {
     <main>
       <header className="topbar">
         <div>
-          <p className="eyebrow">Perception-aware autonomy demo</p>
+          <p className="eyebrow">SLAM-lite visual odometry + risk-aware routing</p>
           <h1>SafeNav</h1>
         </div>
         <div className="headerStats">
@@ -220,6 +220,14 @@ export default function App() {
 
       <div className="appGrid">
         <div className="mainColumn">
+          <VisualMappingPanel
+            slam={slamResult}
+            isProcessing={slamProcessing}
+            status={slamStatus}
+            uploadedFileName={slamFileName}
+            onUpload={uploadSlamVideo}
+            onDemo={runSlamDemo}
+          />
           <CampusMap
             graph={graph}
             route={route}
@@ -261,14 +269,6 @@ export default function App() {
             onApply={applyPerception}
             onUpload={uploadFrame}
             onToggleLive={() => setLiveMode((value) => !value)}
-          />
-          <VisualMappingPanel
-            slam={slamResult}
-            isProcessing={slamProcessing}
-            status={slamStatus}
-            uploadedFileName={slamFileName}
-            onUpload={uploadSlamVideo}
-            onDemo={runSlamDemo}
           />
           <RiskDashboard summary={summary} />
           <MetricsPanel route={route} metrics={metrics} />

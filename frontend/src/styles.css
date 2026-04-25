@@ -90,7 +90,7 @@ main {
 
 .appGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 390px;
+  grid-template-columns: minmax(0, 1fr) 370px;
   gap: 18px;
   max-width: 1440px;
   margin: 0 auto;
@@ -118,6 +118,32 @@ main {
   font-size: 0.86rem;
   line-height: 1.45;
   margin: 0 0 12px;
+}
+
+.mainColumn > .mappingPanel {
+  padding: 18px;
+}
+
+.mainColumn > .mappingPanel .sectionHeader h2 {
+  font-size: clamp(1.65rem, 3vw, 2.5rem);
+  line-height: 1.05;
+}
+
+.mainColumn > .mappingPanel .panelCopy {
+  font-size: 1rem;
+  max-width: 860px;
+}
+
+.mainColumn > .mappingPanel .buttonGrid.compact {
+  grid-template-columns: repeat(2, minmax(0, 220px));
+  max-width: 470px;
+}
+
+.mainColumn > .mappingPanel .uploadButton,
+.mainColumn > .mappingPanel .buttonGrid button {
+  min-height: 48px;
+  font-size: 1rem;
+  font-weight: 800;
 }
 
 .processing,
@@ -385,6 +411,23 @@ select {
   background: #101612;
 }
 
+.mainColumn > .mappingPanel .mappingViz {
+  height: clamp(280px, 38vh, 420px);
+}
+
+.mainColumn > .mappingPanel .featureGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.mainColumn > .mappingPanel .instanceStrip {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.mainColumn > .mappingPanel .instanceHeader {
+  grid-column: 1 / -1;
+}
+
 .mappingViz rect {
   fill: #101612;
 }
@@ -562,6 +605,11 @@ select {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .mainColumn > .mappingPanel .featureGrid,
+  .mainColumn > .mappingPanel .instanceStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -577,8 +625,19 @@ select {
   .sideColumn,
   .metricGrid,
   .featureGrid,
-  .buttonGrid.compact {
+  .buttonGrid.compact,
+  .mainColumn > .mappingPanel .featureGrid,
+  .mainColumn > .mappingPanel .instanceStrip,
+  .mainColumn > .mappingPanel .buttonGrid.compact {
     grid-template-columns: 1fr;
+  }
+
+  .mainColumn > .mappingPanel {
+    padding: 14px;
+  }
+
+  .mainColumn > .mappingPanel .mappingViz {
+    height: 250px;
   }
 
   .mapPanel {
