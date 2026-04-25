@@ -474,6 +474,47 @@ select {
   border-radius: 8px;
   overflow: hidden;
   background: #fbfdfb;
+  display: block;
+  padding: 0;
+  text-align: left;
+  position: relative;
+  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.instanceCard:hover,
+.instanceCard:focus-visible {
+  border-color: #2d7ff0;
+  box-shadow: 0 14px 26px rgba(30, 64, 52, 0.16);
+  transform: translateY(-4px) scale(1.015);
+  outline: none;
+}
+
+.activeInstance {
+  border-color: #2d7ff0;
+  box-shadow: 0 0 0 2px rgba(45, 127, 240, 0.18);
+}
+
+.inspectHint {
+  position: absolute;
+  right: 9px;
+  top: 9px;
+  z-index: 1;
+  border-radius: 999px;
+  background: rgba(13, 21, 17, 0.86);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  opacity: 0;
+  padding: 5px 8px;
+  pointer-events: none;
+  transform: translateY(-3px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.instanceCard:hover .inspectHint,
+.instanceCard:focus-visible .inspectHint {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .instanceCard img,
@@ -496,6 +537,7 @@ select {
   display: grid;
   gap: 7px;
   padding: 9px;
+  color: #17201c;
 }
 
 .instanceMetrics {
@@ -512,11 +554,38 @@ select {
   color: #4e6156;
 }
 
-.instanceBody p {
+.instanceDecision {
   margin: 0;
   color: #536159;
   font-size: 0.83rem;
   line-height: 1.4;
+}
+
+.inspectionPanel {
+  border: 1px solid #c8d8ce;
+  border-radius: 8px;
+  background: #f7fbf8;
+  display: grid;
+  gap: 10px;
+  margin: 12px 0;
+  padding: 12px;
+}
+
+.inspectionPanel h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.inspectionPanel p {
+  color: #47584e;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.inspectionGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .metric {
@@ -607,7 +676,8 @@ select {
   }
 
   .mainColumn > .mappingPanel .featureGrid,
-  .mainColumn > .mappingPanel .instanceStrip {
+  .mainColumn > .mappingPanel .instanceStrip,
+  .inspectionGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -628,7 +698,8 @@ select {
   .buttonGrid.compact,
   .mainColumn > .mappingPanel .featureGrid,
   .mainColumn > .mappingPanel .instanceStrip,
-  .mainColumn > .mappingPanel .buttonGrid.compact {
+  .mainColumn > .mappingPanel .buttonGrid.compact,
+  .inspectionGrid {
     grid-template-columns: 1fr;
   }
 

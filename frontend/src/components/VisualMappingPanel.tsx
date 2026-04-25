@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Box, Upload, Wand2 } from "lucide-react";
 import type { KeyframeInstance, SlamLiteResult } from "../types";
 
@@ -128,34 +129,82 @@ function MappingViz({ slam }: { slam: SlamLiteResult | null }) {
 }
 
 function KeyframeInstances({ instances }: { instances: KeyframeInstance[] }) {
+  const [selectedInstance, setSelectedInstance] = useState<KeyframeInstance | null>(null);
+
   if (instances.length === 0) {
     return null;
   }
 
   return (
-    <div className="instanceStrip">
-      <div className="instanceHeader">
-        <span>Video Instances</span>
-        <strong>{instances.length}</strong>
+    <>
+      <div className="instanceStrip">
+        <div className="instanceHeader">
+          <span>Video Instances</span>
+          <strong>{instances.length}</strong>
+        </div>
+        {instances.map((instance) => (
+          <button
+            className={`instanceCard ${selectedInstance?.index === instance.index ? "activeInstance" : ""}`}
+            key={`${instance.title}-${instance.index}`}
+            onClick={() => setSelectedInstance(instance)}
+            type="button"
+            aria-label={`Inspect ${instance.title}`}
+          >
+            <span className="inspectHint">Click to inspect</span>
+            {instance.imageDataUrl ? (
+              <img src={instance.imageDataUrl} alt={`${instance.title} with ORB keypoints`} />
+            ) : (
+              <span className="instancePlaceholder">Demo instance</span>
+            )}
+            <span className="instanceBody">
+              <strong>{instance.title}</strong>
+              <span className="instanceMetrics">
+                <span>KP {instance.keypoints}</span>
+                <span>Matches {instance.matchesToNext}</span>
+                <span>Inliers {instance.inliersToNext}</span>
+              </span>
+              <span className="instanceDecision">{instance.decision}</span>
+            </span>
+          </button>
+        ))}
       </div>
-      {instances.map((instance) => (
-        <article className="instanceCard" key={`${instance.title}-${instance.index}`}>
-          {instance.imageDataUrl ? (
-            <img src={instance.imageDataUrl} alt={`${instance.title} with ORB keypoints`} />
-          ) : (
-            <div className="instancePlaceholder">Demo instance</div>
-          )}
-          <div className="instanceBody">
-            <strong>{instance.title}</strong>
-            <div className="instanceMetrics">
-              <span>KP {instance.keypoints}</span>
-              <span>Matches {instance.matchesToNext}</span>
-              <span>Inliers {instance.inliersToNext}</span>
-            </div>
-            <p>{instance.decision}</p>
-          </div>
-        </article>
-      ))}
+      {selectedInstance && <KeyframeInspection instance={selectedInstance} />}
+    </>
+  );
+}
+
+function KeyframeInspection({ instance }: { instance: KeyframeInstance }) {
+  const matchSupport = instance.matchesToNext > 0 ? instance.inliersToNext / instance.matchesToNext : 0;
+  const featureQuality = instance.keypoints >= 900 ? "high" : instance.keypoints >= 450 ? "moderate" : "low";
+  const geometryQuality = matchSupport >= 0.45 ? "strong" : matchSupport >= 0.2 ? "usable" : "weak";
+  const safetySignal =
+    geometryQuality === "strong"
+      ? "Mapping confidence is strong here, so SafeNav can trust the local camera motion estimate and avoid adding uncertainty-based risk."
+      : geometryQuality === "usable"
+        ? "Mapping confidence is usable but not perfect, so SafeNav treats this area as observable while still watching for uncertainty."
+        : "Mapping confidence is weak here, so SafeNav treats this segment as more uncertain and may increase visibility or obstruction risk.";
+
+  return (
+    <div className="inspectionPanel">
+      <div>
+        <p className="eyebrow">Keyframe Inspection</p>
+        <h3>{instance.title}</h3>
+      </div>
+      <div className="inspectionGrid">
+        <Metric label="Feature quality" value={featureQuality} />
+        <Metric label="Geometry quality" value={geometryQuality} />
+        <Metric label="Inlier ratio" value={`${Math.round(matchSupport * 100)}%`} />
+        <Metric label="Pose signal" value={instance.inliersToNext >= 25 ? "accepted" : "uncertain"} />
+      </div>
+      <p>
+        This frame tells SafeNav how much visual structure was available at this moment in the video. ORB keypoints measure visible texture and corners, matches connect this frame to the next sampled view, and RANSAC inliers are the matches that agree with one camera-motion model.
+      </p>
+      <p>
+        {safetySignal}
+      </p>
+      <p>
+        Decision: {instance.decision}
+      </p>
     </div>
   );
 }
