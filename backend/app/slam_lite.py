@@ -55,9 +55,10 @@ class SlamLiteProcessor:
     closure, global scale recovery, or dense mapping.
     """
 
-    def __init__(self, frame_interval: int = 10, max_keyframes: int = 14) -> None:
+    def __init__(self, frame_interval: int = 10, max_keyframes: int = 10, max_frame_dimension: int = 720) -> None:
         self.frame_interval = frame_interval
         self.max_keyframes = max_keyframes
+        self.max_frame_dimension = max_frame_dimension
 
     def process_video(self, video_path: str) -> SlamLiteResult:
         if cv2 is None or np is None:
@@ -196,10 +197,19 @@ class SlamLiteProcessor:
             if not ok:
                 break
             if frame_index % self.frame_interval == 0:
-                frames.append(frame)
+                frames.append(self._resize_frame(frame))
             frame_index += 1
         capture.release()
         return frames
+
+    def _resize_frame(self, frame: Any) -> Any:
+        height, width = frame.shape[:2]
+        longest_side = max(width, height)
+        if longest_side <= self.max_frame_dimension:
+            return frame
+        scale = self.max_frame_dimension / float(longest_side)
+        target_size = (int(width * scale), int(height * scale))
+        return cv2.resize(frame, target_size, interpolation=cv2.INTER_AREA)
 
     @staticmethod
     def _triangulate_points(

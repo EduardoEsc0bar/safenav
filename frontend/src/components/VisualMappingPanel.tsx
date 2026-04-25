@@ -4,11 +4,15 @@ import type { SlamLiteResult } from "../types";
 export function VisualMappingPanel({
   slam,
   isProcessing,
+  status,
+  uploadedFileName,
   onUpload,
   onDemo
 }: {
   slam: SlamLiteResult | null;
   isProcessing: boolean;
+  status: string;
+  uploadedFileName: string;
   onUpload: (file: File) => void;
   onDemo: () => void;
 }) {
@@ -28,14 +32,27 @@ export function VisualMappingPanel({
         <label className="uploadButton" title="Upload iPhone video">
           <Upload size={16} />
           <span>Upload Video</span>
-          <input type="file" accept="video/*,.mov,.mp4" onChange={(event) => event.target.files?.[0] && onUpload(event.target.files[0])} />
+          <input
+            type="file"
+            accept="video/*,.mov,.mp4"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.currentTarget.value = "";
+              if (file) onUpload(file);
+            }}
+          />
         </label>
         <button onClick={onDemo} disabled={isProcessing} title="Run simulated SLAM-lite demo">
           <Wand2 size={16} />
           <span>Demo Map</span>
         </button>
       </div>
-      {isProcessing && <div className="processing">Processing visual odometry...</div>}
+      {(isProcessing || status || uploadedFileName) && (
+        <div className="processing">
+          <strong>{isProcessing ? "Processing visual odometry..." : status || "Ready"}</strong>
+          {uploadedFileName && <span>{uploadedFileName}</span>}
+        </div>
+      )}
       <MappingViz slam={slam} />
       <div className="featureGrid">
         <Metric label="Frames" value={slam?.framesProcessed ?? "-"} />
@@ -44,11 +61,17 @@ export function VisualMappingPanel({
         <Metric label="Matches" value={slam?.totalMatches ?? "-"} />
         <Metric label="Inliers" value={slam?.inlierMatches ?? "-"} />
         <Metric label="Confidence" value={slam ? slam.reconstructionConfidence.toFixed(2) : "-"} />
+        <Metric label="Map conf." value={slam ? slam.mapConfidence.toFixed(2) : "-"} />
+        <Metric label="Latency" value={slam ? `${slam.processingLatencyMs.toFixed(0)} ms` : "-"} />
       </div>
       <p className="panelCopy">
         {slam?.explanation ?? "SafeNav estimates camera motion from multiple video frames using feature matching, essential matrix estimation, pose recovery, and sparse triangulation."}
       </p>
-      {slam?.fallbackUsed && <p className="fallbackNote">Fallback demo data is active.</p>}
+      {slam && (
+        <p className={slam.fallbackUsed ? "fallbackNote" : "successNote"}>
+          {slam.fallbackUsed ? "Fallback demo data is active; the upload could not produce stable geometry." : "Uploaded video produced a sparse visual-odometry reconstruction."}
+        </p>
+      )}
     </section>
   );
 }

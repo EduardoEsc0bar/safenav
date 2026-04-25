@@ -26,6 +26,8 @@ export default function App() {
   const [perceptionFeatures, setPerceptionFeatures] = useState<PerceptionFeatures | null>(null);
   const [slamResult, setSlamResult] = useState<SlamLiteResult | null>(null);
   const [slamProcessing, setSlamProcessing] = useState(false);
+  const [slamStatus, setSlamStatus] = useState("");
+  const [slamFileName, setSlamFileName] = useState("");
   const [liveMode, setLiveMode] = useState(false);
   const [error, setError] = useState("");
 
@@ -145,6 +147,8 @@ export default function App() {
 
   const runSlamDemo = async () => {
     setSlamProcessing(true);
+    setSlamFileName("");
+    setSlamStatus("Running SLAM-lite demo data");
     try {
       const response = await api.slamDemo(selectedNodeId) as {
         slam: SlamLiteResult;
@@ -159,9 +163,11 @@ export default function App() {
       setRoute(response.route);
       setMetrics(response.metrics);
       setEventExplanation(response.slam.explanation);
+      setSlamStatus(response.slam.fallbackUsed ? "Demo reconstruction loaded" : "Reconstruction complete");
       setError("");
     } catch (err) {
       setError(String(err));
+      setSlamStatus("SLAM-lite demo failed");
     } finally {
       setSlamProcessing(false);
     }
@@ -169,6 +175,8 @@ export default function App() {
 
   const uploadSlamVideo = async (file: File) => {
     setSlamProcessing(true);
+    setSlamFileName(`${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`);
+    setSlamStatus("Uploading video to SLAM-lite backend");
     try {
       const response = await api.slamUploadVideo(file, selectedNodeId) as {
         slam: SlamLiteResult;
@@ -183,9 +191,11 @@ export default function App() {
       setRoute(response.route);
       setMetrics(response.metrics);
       setEventExplanation(response.slam.explanation);
+      setSlamStatus(response.slam.fallbackUsed ? "Upload processed with fallback demo data" : "Uploaded video reconstruction complete");
       setError("");
     } catch (err) {
       setError(String(err));
+      setSlamStatus("Video upload or SLAM-lite processing failed");
     } finally {
       setSlamProcessing(false);
     }
@@ -255,6 +265,8 @@ export default function App() {
           <VisualMappingPanel
             slam={slamResult}
             isProcessing={slamProcessing}
+            status={slamStatus}
+            uploadedFileName={slamFileName}
             onUpload={uploadSlamVideo}
             onDemo={runSlamDemo}
           />

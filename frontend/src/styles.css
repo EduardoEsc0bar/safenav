@@ -121,7 +121,8 @@ main {
 }
 
 .processing,
-.fallbackNote {
+.fallbackNote,
+.successNote {
   border: 1px solid #d5ded7;
   background: #f7faf8;
   border-radius: 7px;
@@ -131,9 +132,24 @@ main {
   padding: 8px;
 }
 
+.processing {
+  display: grid;
+  gap: 3px;
+}
+
+.processing span {
+  color: #65746b;
+  overflow-wrap: anywhere;
+}
+
 .fallbackNote {
   border-color: #ead39d;
   background: #fff8e8;
+}
+
+.successNote {
+  border-color: #b9dfc4;
+  background: #f0fbf3;
 }
 
 .mapPanel {
