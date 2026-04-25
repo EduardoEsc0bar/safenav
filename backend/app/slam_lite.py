@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import math
 import os
 import random
@@ -34,6 +35,7 @@ class SlamLiteResult:
     fallback_used: bool = False
     reconstruction_mode: str = "video"
     fallback_reason: str = ""
+    keyframe_instances: list[dict[str, Any]] | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -51,6 +53,7 @@ class SlamLiteResult:
             "fallbackUsed": self.fallback_used,
             "reconstructionMode": self.reconstruction_mode,
             "fallbackReason": self.fallback_reason,
+            "keyframeInstances": self.keyframe_instances or [],
         }
 
 
@@ -104,6 +107,7 @@ class SlamLiteProcessor:
         total_matches = 0
         inlier_matches = 0
         point_cloud: list[dict[str, float]] = []
+        pair_metrics: dict[int, dict[str, Any]] = {}
 
         # Pose state tracks a simple world-space camera path.
         world_rotation = np.eye(3, dtype=np.float64)
@@ -114,6 +118,11 @@ class SlamLiteProcessor:
             keypoints_a, desc_a = keypoints_descriptors[pair_index]
             keypoints_b, desc_b = keypoints_descriptors[pair_index + 1]
             if desc_a is None or desc_b is None or len(desc_a) < 8 or len(desc_b) < 8:
+                pair_metrics[pair_index] = {
+                    "matches": 0,
+                    "inliers": 0,
+                    "decision": "Skipped: not enough ORB descriptors for reliable matching.",
+                }
                 continue
 
             raw_matches = matcher.knnMatch(desc_a, desc_b, k=2)
@@ -137,6 +146,11 @@ class SlamLiteProcessor:
             total_matches += len(good_matches)
 
             if len(good_matches) < 8:
+                pair_metrics[pair_index] = {
+                    "matches": len(good_matches),
+                    "inliers": 0,
+                    "decision": "Low texture or repeated texture: not enough reliable feature matches.",
+                }
                 continue
 
             pts_a = np.float32([keypoints_a[match.queryIdx].pt for match in good_matches])
@@ -150,6 +164,11 @@ class SlamLiteProcessor:
                 threshold=2.0,
             )
             if essential is None or essential_mask is None:
+                pair_metrics[pair_index] = {
+                    "matches": len(good_matches),
+                    "inliers": 0,
+                    "decision": "RANSAC could not estimate a stable essential matrix for this frame pair.",
+                }
                 continue
 
             _pose_inliers, relative_rotation, relative_translation, pose_mask = cv2.recoverPose(
@@ -160,11 +179,21 @@ class SlamLiteProcessor:
                 mask=essential_mask,
             )
             if pose_mask is None:
+                pair_metrics[pair_index] = {
+                    "matches": len(good_matches),
+                    "inliers": 0,
+                    "decision": "Essential matrix estimated, but pose recovery failed for this frame pair.",
+                }
                 continue
 
             inlier_selector = pose_mask.ravel() > 0
             pair_inliers = int(inlier_selector.sum())
             inlier_matches += pair_inliers
+            pair_metrics[pair_index] = {
+                "matches": len(good_matches),
+                "inliers": pair_inliers,
+                "decision": describe_pair_decision(len(good_matches), pair_inliers),
+            }
             if pair_inliers < 8:
                 continue
 
@@ -209,6 +238,7 @@ class SlamLiteProcessor:
         point_factor = min(1.0, len(point_cloud) / 250.0)
         confidence = clamp(0.5 * inlier_ratio + 0.25 * keyframe_factor + 0.25 * point_factor)
         map_confidence = clamp(0.25 + confidence * 0.75)
+        keyframe_instances = self._build_keyframe_instances(frames, keypoints_descriptors, pair_metrics)
 
         return SlamLiteResult(
             frames_processed=len(frames),
@@ -223,6 +253,7 @@ class SlamLiteProcessor:
             processing_latency_ms=round(latency, 3),
             explanation="SafeNav estimated camera motion from multiple video frames using feature matching, essential matrix estimation, pose recovery, and sparse triangulation.",
             reconstruction_mode="video",
+            keyframe_instances=keyframe_instances,
         )
 
     def _extract_keyframes(self, video_path: str) -> list[Any]:
@@ -288,6 +319,68 @@ class SlamLiteProcessor:
                 os.unlink(output.name)
             return None
 
+    def _build_keyframe_instances(
+        self,
+        frames: list[Any],
+        keypoints_descriptors: list[tuple[Any, Any]],
+        pair_metrics: dict[int, dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        if cv2 is None or np is None or not frames:
+            return []
+
+        sample_count = min(4, len(frames))
+        if sample_count == 1:
+            indices = [0]
+        else:
+            indices = sorted({round(i * (len(frames) - 1) / (sample_count - 1)) for i in range(sample_count)})
+
+        instances: list[dict[str, Any]] = []
+        for index in indices:
+            keypoints, _desc = keypoints_descriptors[index]
+            keypoint_count = len(keypoints or [])
+            metrics = pair_metrics.get(index) or pair_metrics.get(index - 1) or {
+                "matches": 0,
+                "inliers": 0,
+                "decision": "Reference keyframe used to initialize the visual trajectory.",
+            }
+            preview = self._encode_keyframe_preview(frames[index], keypoints or [], index, metrics)
+            instances.append(
+                {
+                    "index": index,
+                    "title": f"Keyframe {index + 1}",
+                    "imageDataUrl": preview,
+                    "keypoints": keypoint_count,
+                    "matchesToNext": int(metrics.get("matches", 0)),
+                    "inliersToNext": int(metrics.get("inliers", 0)),
+                    "decision": metrics.get("decision", "Frame sampled for visual odometry."),
+                }
+            )
+        return instances
+
+    @staticmethod
+    def _encode_keyframe_preview(frame: Any, keypoints: list[Any], index: int, metrics: dict[str, Any]) -> str:
+        draw_frame = frame.copy()
+        drawn = cv2.drawKeypoints(
+            draw_frame,
+            keypoints[:450],
+            None,
+            color=(70, 220, 140),
+            flags=cv2.DrawMatchesFlags_DRAW_RICH_KEYPOINTS,
+        )
+        height, width = drawn.shape[:2]
+        target_width = 420
+        if width > target_width:
+            scale = target_width / float(width)
+            drawn = cv2.resize(drawn, (target_width, int(height * scale)), interpolation=cv2.INTER_AREA)
+
+        label = f"KF {index + 1} | kp {len(keypoints)} | matches {metrics.get('matches', 0)} | inliers {metrics.get('inliers', 0)}"
+        cv2.rectangle(drawn, (0, 0), (drawn.shape[1], 34), (8, 16, 12), -1)
+        cv2.putText(drawn, label, (10, 23), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (235, 245, 238), 1, cv2.LINE_AA)
+        ok, encoded = cv2.imencode(".jpg", drawn, [int(cv2.IMWRITE_JPEG_QUALITY), 72])
+        if not ok:
+            return ""
+        return "data:image/jpeg;base64," + base64.b64encode(encoded.tobytes()).decode("ascii")
+
     @staticmethod
     def _triangulate_points(
         *,
@@ -332,6 +425,16 @@ def normalize_point_cloud(points: list[dict[str, float]]) -> list[dict[str, floa
     normalized = centered / scale * 6.0
     bounded = normalized[np.linalg.norm(normalized, axis=1) < 40]
     return [{"x": round(float(x), 3), "y": round(float(y), 3), "z": round(float(z), 3)} for x, y, z in bounded]
+
+
+def describe_pair_decision(matches: int, inliers: int) -> str:
+    if inliers >= 80:
+        return "Strong geometry: many RANSAC inliers supported pose recovery and triangulation."
+    if inliers >= 25:
+        return "Usable geometry: enough consistent matches supported camera motion estimation."
+    if matches >= 40:
+        return "Weak geometry: features matched, but only a small set survived RANSAC."
+    return "Low confidence: this frame pair contributed little to mapping confidence."
 
 
 def pose_payload(index: int, position: Any, rotation: Any) -> dict[str, Any]:
@@ -388,8 +491,24 @@ def demo_reconstruction(start_time: float | None = None, reason: str = "Demo fal
         fallback_used=True,
         reconstruction_mode="demo",
         fallback_reason=reason,
+        keyframe_instances=demo_keyframe_instances(),
     )
 
 
 def clamp(value: float, lower: float = 0.0, upper: float = 1.0) -> float:
     return max(lower, min(upper, value))
+
+
+def demo_keyframe_instances() -> list[dict[str, Any]]:
+    return [
+        {
+            "index": index,
+            "title": f"Demo keyframe {index + 1}",
+            "imageDataUrl": "",
+            "keypoints": 900 + index * 120,
+            "matchesToNext": 240 + index * 35,
+            "inliersToNext": 150 + index * 28,
+            "decision": describe_pair_decision(240 + index * 35, 150 + index * 28),
+        }
+        for index in range(4)
+    ]

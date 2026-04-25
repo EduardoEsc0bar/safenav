@@ -1,5 +1,5 @@
 import { Box, Upload, Wand2 } from "lucide-react";
-import type { SlamLiteResult } from "../types";
+import type { KeyframeInstance, SlamLiteResult } from "../types";
 
 export function VisualMappingPanel({
   slam,
@@ -67,6 +67,7 @@ export function VisualMappingPanel({
       <p className="panelCopy">
         {slam?.explanation ?? "SafeNav estimates camera motion from multiple video frames using feature matching, essential matrix estimation, pose recovery, and sparse triangulation."}
       </p>
+      <KeyframeInstances instances={slam?.keyframeInstances ?? []} />
       {slam && (
         <p className={slam.fallbackUsed ? "fallbackNote" : "successNote"}>
           {slam.fallbackUsed ? "Fallback demo data is active; the upload could not produce stable geometry." : "Uploaded video produced a sparse visual-odometry reconstruction."}
@@ -111,7 +112,8 @@ function MappingViz({ slam }: { slam: SlamLiteResult | null }) {
   return (
     <svg className="mappingViz" viewBox="0 0 320 180" role="img" aria-label="Sparse 3D reconstruction projected top down">
       <rect x="0" y="0" width="320" height="180" rx="8" />
-      {points.length === 0 && <text x="160" y="92" textAnchor="middle">Upload video or run demo</text>}
+      {points.length === 0 && poses.length === 0 && <text x="160" y="92" textAnchor="middle">Upload video or run demo</text>}
+      {points.length === 0 && poses.length > 0 && <text x="160" y="92" textAnchor="middle">Camera path estimated; sparse points were limited</text>}
       {points.map((point, index) => {
         const projected = project(point.x, point.z);
         return <circle key={`${point.x}-${point.y}-${point.z}-${index}`} cx={projected.x} cy={projected.y} r="1.45" className="mapPoint" />;
@@ -122,5 +124,38 @@ function MappingViz({ slam }: { slam: SlamLiteResult | null }) {
         return <circle key={pose.index} cx={projected.x} cy={projected.y} r="3.2" className="cameraPose" />;
       })}
     </svg>
+  );
+}
+
+function KeyframeInstances({ instances }: { instances: KeyframeInstance[] }) {
+  if (instances.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="instanceStrip">
+      <div className="instanceHeader">
+        <span>Video Instances</span>
+        <strong>{instances.length}</strong>
+      </div>
+      {instances.map((instance) => (
+        <article className="instanceCard" key={`${instance.title}-${instance.index}`}>
+          {instance.imageDataUrl ? (
+            <img src={instance.imageDataUrl} alt={`${instance.title} with ORB keypoints`} />
+          ) : (
+            <div className="instancePlaceholder">Demo instance</div>
+          )}
+          <div className="instanceBody">
+            <strong>{instance.title}</strong>
+            <div className="instanceMetrics">
+              <span>KP {instance.keypoints}</span>
+              <span>Matches {instance.matchesToNext}</span>
+              <span>Inliers {instance.inliersToNext}</span>
+            </div>
+            <p>{instance.decision}</p>
+          </div>
+        </article>
+      ))}
+    </div>
   );
 }

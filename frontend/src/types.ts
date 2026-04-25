@@ -111,4 +111,15 @@ export interface SlamLiteResult {
   fallbackUsed: boolean;
   reconstructionMode: string;
   fallbackReason: string;
+  keyframeInstances: KeyframeInstance[];
+}
+
+export interface KeyframeInstance {
+  index: number;
+  title: string;
+  imageDataUrl: string;
+  keypoints: number;
+  matchesToNext: number;
+  inliersToNext: number;
+  decision: string;
 }
