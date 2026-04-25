@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import math
+import os
 import random
+import shutil
+import subprocess
+import tempfile
 import time
 from dataclasses import dataclass
 from typing import Any
@@ -28,6 +32,8 @@ class SlamLiteResult:
     processing_latency_ms: float
     explanation: str
     fallback_used: bool = False
+    reconstruction_mode: str = "video"
+    fallback_reason: str = ""
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -43,6 +49,8 @@ class SlamLiteResult:
             "processingLatencyMs": self.processing_latency_ms,
             "explanation": self.explanation,
             "fallbackUsed": self.fallback_used,
+            "reconstructionMode": self.reconstruction_mode,
+            "fallbackReason": self.fallback_reason,
         }
 
 
@@ -67,14 +75,28 @@ class SlamLiteProcessor:
         start = time.perf_counter()
         frames = self._extract_keyframes(video_path)
         if len(frames) < 2:
-            return demo_reconstruction(start_time=start, reason="Not enough keyframes could be extracted from the uploaded video.")
+            transcoded_path = self._transcode_for_opencv(video_path)
+            try:
+                if transcoded_path:
+                    frames = self._extract_keyframes(transcoded_path)
+            finally:
+                if transcoded_path and os.path.exists(transcoded_path):
+                    os.unlink(transcoded_path)
+        if len(frames) < 2:
+            return demo_reconstruction(
+                start_time=start,
+                reason=(
+                    "OpenCV could not decode enough frames. iPhone videos can remain HEVC/H.265 even after being saved as .mp4; "
+                    "export as H.264 / Most Compatible, or install ffmpeg so SafeNav can transcode automatically."
+                ),
+            )
 
         gray_frames = [cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) for frame in frames]
         height, width = gray_frames[0].shape[:2]
         focal = float(max(width, height))
         camera_matrix = np.array([[focal, 0.0, width / 2.0], [0.0, focal, height / 2.0], [0.0, 0.0, 1.0]], dtype=np.float64)
 
-        orb = cv2.ORB_create(nfeatures=1400, scaleFactor=1.2, nlevels=8)
+        orb = cv2.ORB_create(nfeatures=2200, scaleFactor=1.2, nlevels=8, fastThreshold=12)
         keypoints_descriptors = [orb.detectAndCompute(gray, None) for gray in gray_frames]
         total_keypoints = sum(len(keypoints or []) for keypoints, _desc in keypoints_descriptors)
 
@@ -100,8 +122,18 @@ class SlamLiteProcessor:
                 if len(pair) != 2:
                     continue
                 best, second = pair
-                if best.distance < 0.75 * second.distance:
+                if best.distance < 0.82 * second.distance:
                     good_matches.append(best)
+
+            if len(good_matches) < 12:
+                distance_matches = []
+                for pair in raw_matches:
+                    if pair:
+                        distance_matches.append(pair[0])
+                good_matches = sorted(
+                    [match for match in distance_matches if match.distance <= 72],
+                    key=lambda match: match.distance,
+                )[:350]
             total_matches += len(good_matches)
 
             if len(good_matches) < 8:
@@ -115,7 +147,7 @@ class SlamLiteProcessor:
                 camera_matrix,
                 method=cv2.RANSAC,
                 prob=0.999,
-                threshold=1.2,
+                threshold=2.0,
             )
             if essential is None or essential_mask is None:
                 continue
@@ -161,10 +193,17 @@ class SlamLiteProcessor:
             poses.append(pose_payload(pair_index + 1, world_position, world_rotation))
 
         latency = (time.perf_counter() - start) * 1000.0
-        if len(poses) < 2 or inlier_matches < 12 or not point_cloud:
-            return demo_reconstruction(start_time=start, reason="Video geometry was too weak for a stable reconstruction.")
+        if len(poses) < 2 or inlier_matches < 8:
+            return demo_reconstruction(
+                start_time=start,
+                reason=(
+                    f"Video geometry was too weak for pose recovery "
+                    f"({len(poses)} poses, {inlier_matches} inliers, {total_matches} matches). "
+                    "Try a slower pan with sideways motion across textured objects."
+                ),
+            )
 
-        point_cloud = point_cloud[:900]
+        point_cloud = normalize_point_cloud(point_cloud)[:900]
         inlier_ratio = inlier_matches / max(1, total_matches)
         keyframe_factor = min(1.0, len(poses) / max(2.0, len(frames) * 0.75))
         point_factor = min(1.0, len(point_cloud) / 250.0)
@@ -183,6 +222,7 @@ class SlamLiteProcessor:
             map_confidence=round(map_confidence, 3),
             processing_latency_ms=round(latency, 3),
             explanation="SafeNav estimated camera motion from multiple video frames using feature matching, essential matrix estimation, pose recovery, and sparse triangulation.",
+            reconstruction_mode="video",
         )
 
     def _extract_keyframes(self, video_path: str) -> list[Any]:
@@ -192,11 +232,16 @@ class SlamLiteProcessor:
 
         frames: list[Any] = []
         frame_index = 0
+        frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+        if frame_count > 0:
+            interval = max(1, frame_count // self.max_keyframes)
+        else:
+            interval = self.frame_interval
         while len(frames) < self.max_keyframes:
             ok, frame = capture.read()
             if not ok:
                 break
-            if frame_index % self.frame_interval == 0:
+            if frame_index % interval == 0:
                 frames.append(self._resize_frame(frame))
             frame_index += 1
         capture.release()
@@ -210,6 +255,38 @@ class SlamLiteProcessor:
         scale = self.max_frame_dimension / float(longest_side)
         target_size = (int(width * scale), int(height * scale))
         return cv2.resize(frame, target_size, interpolation=cv2.INTER_AREA)
+
+    @staticmethod
+    def _transcode_for_opencv(video_path: str) -> str | None:
+        ffmpeg_path = shutil.which("ffmpeg")
+        if not ffmpeg_path:
+            return None
+
+        output = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
+        output.close()
+        command = [
+            ffmpeg_path,
+            "-y",
+            "-i",
+            video_path,
+            "-vf",
+            "scale='min(960,iw)':-2",
+            "-an",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-movflags",
+            "+faststart",
+            output.name,
+        ]
+        try:
+            subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
+            return output.name
+        except Exception:
+            if os.path.exists(output.name):
+                os.unlink(output.name)
+            return None
 
     @staticmethod
     def _triangulate_points(
@@ -231,10 +308,30 @@ class SlamLiteProcessor:
             if not np.isfinite(point).all():
                 continue
             x, y, z = [float(value) for value in point]
-            if abs(x) > 80 or abs(y) > 80 or abs(z) > 120:
+            if abs(x) > 100_000 or abs(y) > 100_000 or abs(z) > 100_000:
                 continue
             output.append({"x": round(x, 3), "y": round(y, 3), "z": round(z, 3)})
         return output
+
+
+def normalize_point_cloud(points: list[dict[str, float]]) -> list[dict[str, float]]:
+    if not points or np is None:
+        return points
+
+    array = np.array([[point["x"], point["y"], point["z"]] for point in points], dtype=np.float64)
+    finite_mask = np.isfinite(array).all(axis=1)
+    array = array[finite_mask]
+    if len(array) == 0:
+        return []
+
+    center = np.median(array, axis=0)
+    centered = array - center
+    scale = float(np.percentile(np.linalg.norm(centered, axis=1), 85))
+    if scale < 1e-6:
+        scale = 1.0
+    normalized = centered / scale * 6.0
+    bounded = normalized[np.linalg.norm(normalized, axis=1) < 40]
+    return [{"x": round(float(x), 3), "y": round(float(y), 3), "z": round(float(z), 3)} for x, y, z in bounded]
 
 
 def pose_payload(index: int, position: Any, rotation: Any) -> dict[str, Any]:
@@ -289,6 +386,8 @@ def demo_reconstruction(start_time: float | None = None, reason: str = "Demo fal
         processing_latency_ms=round(latency, 3),
         explanation=f"SafeNav estimated camera motion from multiple video frames using feature matching, essential matrix estimation, pose recovery, and sparse triangulation. {reason}",
         fallback_used=True,
+        reconstruction_mode="demo",
+        fallback_reason=reason,
     )
 
 

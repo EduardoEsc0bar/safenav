@@ -109,4 +109,6 @@ export interface SlamLiteResult {
   processingLatencyMs: number;
   explanation: string;
   fallbackUsed: boolean;
+  reconstructionMode: string;
+  fallbackReason: string;
 }

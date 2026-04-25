@@ -147,6 +147,14 @@ main {
   background: #fff8e8;
 }
 
+.fallbackNote span,
+.successNote span {
+  display: block;
+  margin-top: 4px;
+  color: #65746b;
+  line-height: 1.4;
+}
+
 .successNote {
   border-color: #b9dfc4;
   background: #f0fbf3;

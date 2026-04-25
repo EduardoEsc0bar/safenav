@@ -70,6 +70,7 @@ export function VisualMappingPanel({
       {slam && (
         <p className={slam.fallbackUsed ? "fallbackNote" : "successNote"}>
           {slam.fallbackUsed ? "Fallback demo data is active; the upload could not produce stable geometry." : "Uploaded video produced a sparse visual-odometry reconstruction."}
+          {slam.fallbackReason && <span>{slam.fallbackReason}</span>}
         </p>
       )}
     </section>
