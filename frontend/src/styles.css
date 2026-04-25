@@ -99,7 +99,7 @@ main {
   margin: 0;
   max-width: 920px;
   color: #ffffff;
-  font-size: clamp(3.4rem, 8.5vw, 8.8rem);
+  font-size: clamp(3.2rem, 7vw, 7.4rem);
   font-weight: 900;
   line-height: 0.86;
 }
@@ -173,7 +173,7 @@ main {
 }
 
 .mainColumn > .mappingPanel {
-  min-height: 72vh;
+  min-height: 620px;
   padding: clamp(18px, 2.2vw, 32px);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -203,7 +203,7 @@ h2 {
 
 .mainColumn > .mappingPanel .sectionHeader h2 {
   max-width: 980px;
-  font-size: clamp(3.2rem, 7vw, 7.2rem);
+  font-size: clamp(3rem, 5.8vw, 6.4rem);
   line-height: 0.88;
   text-transform: none;
 }
@@ -506,7 +506,7 @@ input[type="range"] {
 }
 
 .mainColumn > .mappingPanel .mappingViz {
-  height: clamp(320px, 42vh, 520px);
+  height: clamp(260px, 34vh, 430px);
 }
 
 .mappingViz rect {
@@ -900,6 +900,62 @@ input[type="range"] {
   margin: 0;
   color: #c9c9c0;
   line-height: 1.52;
+}
+
+@media (min-width: 1181px) {
+  .mainColumn {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(520px, 0.95fr);
+    align-items: stretch;
+  }
+
+  .mainColumn > .mappingPanel,
+  .mainColumn > .mapPanel {
+    min-height: min(650px, calc(100vh - 230px));
+  }
+
+  .mainColumn > .mappingPanel {
+    padding: clamp(16px, 1.5vw, 24px);
+  }
+
+  .mainColumn > .mappingPanel .sectionHeader h2 {
+    font-size: clamp(2.6rem, 4.4vw, 5.4rem);
+  }
+
+  .mainColumn > .mappingPanel .panelCopy {
+    font-size: clamp(0.95rem, 1.05vw, 1.25rem);
+  }
+
+  .mainColumn > .mappingPanel .buttonGrid.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: none;
+  }
+
+  .mainColumn > .mappingPanel .featureGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .mainColumn > .mappingPanel .mappingViz {
+    height: clamp(230px, 28vh, 350px);
+  }
+
+  .mainColumn > .mappingPanel .instanceStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .mainColumn > .mapPanel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .mainColumn > .mapPanel .campusMap {
+    height: 100%;
+    min-height: 520px;
+  }
+
+  .mainColumn > .explanationBand {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 1180px) {
