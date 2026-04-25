@@ -122,4 +122,17 @@ export interface KeyframeInstance {
   matchesToNext: number;
   inliersToNext: number;
   decision: string;
+  sceneSafety: SceneSafety;
+}
+
+export interface SceneSafety {
+  lightingScore: number;
+  visibilityScore: number;
+  motionScore: number;
+  crowdScore: number;
+  obstructionScore: number;
+  sceneRiskScore: number;
+  sceneRiskCategory: string;
+  sceneRiskExplanation: string;
+  safetySummary: string;
 }

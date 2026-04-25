@@ -18,6 +18,8 @@ except Exception:  # pragma: no cover - keeps demo endpoint usable if OpenCV imp
     cv2 = None
     np = None
 
+from .risk import score_risk
+
 
 @dataclass(frozen=True)
 class SlamLiteResult:
@@ -343,6 +345,8 @@ class SlamLiteProcessor:
                 "inliers": 0,
                 "decision": "Reference keyframe used to initialize the visual trajectory.",
             }
+            previous_frame = frames[index - 1] if index > 0 else None
+            scene_safety = estimate_scene_safety(frames[index], previous_frame)
             preview = self._encode_keyframe_preview(frames[index], keypoints or [], index, metrics)
             instances.append(
                 {
@@ -353,6 +357,7 @@ class SlamLiteProcessor:
                     "matchesToNext": int(metrics.get("matches", 0)),
                     "inliersToNext": int(metrics.get("inliers", 0)),
                     "decision": metrics.get("decision", "Frame sampled for visual odometry."),
+                    "sceneSafety": scene_safety,
                 }
             )
         return instances
@@ -437,6 +442,87 @@ def describe_pair_decision(matches: int, inliers: int) -> str:
     return "Low confidence: this frame pair contributed little to mapping confidence."
 
 
+def estimate_scene_safety(frame: Any, previous_frame: Any | None = None) -> dict[str, Any]:
+    if cv2 is None or np is None:
+        return demo_scene_safety()
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    lighting_score = clamp(float(gray.mean() / 255.0))
+    laplacian_var = float(cv2.Laplacian(gray, cv2.CV_64F).var())
+    visibility_score = clamp(laplacian_var / 650.0)
+
+    motion_score = 0.0
+    if previous_frame is not None and previous_frame.shape[:2] == frame.shape[:2]:
+        previous_gray = cv2.cvtColor(previous_frame, cv2.COLOR_BGR2GRAY)
+        motion_score = clamp(float(cv2.absdiff(gray, previous_gray).mean() / 55.0))
+
+    edge_density = float((cv2.Canny(gray, 80, 160) > 0).mean())
+    texture_score = clamp(edge_density * 8.0)
+    obstruction_score = clamp((1.0 - lighting_score) * 0.25 + (1.0 - visibility_score) * 0.35 + (1.0 - texture_score) * 0.2)
+    crowd_score = estimate_person_or_activity_score(frame)
+
+    risk = score_risk(
+        lighting_score=lighting_score,
+        crowd_score=crowd_score,
+        visibility_score=visibility_score,
+        motion_score=motion_score,
+        obstruction_score=obstruction_score,
+        base_risk=0.24,
+    )
+    return {
+        "lightingScore": round(lighting_score, 3),
+        "visibilityScore": round(visibility_score, 3),
+        "motionScore": round(motion_score, 3),
+        "crowdScore": round(crowd_score, 3),
+        "obstructionScore": round(obstruction_score, 3),
+        "sceneRiskScore": risk.score,
+        "sceneRiskCategory": risk.category,
+        "sceneRiskExplanation": risk.explanation,
+        "safetySummary": summarize_scene_safety(risk.category, lighting_score, visibility_score, obstruction_score, motion_score),
+    }
+
+
+def estimate_person_or_activity_score(frame: Any) -> float:
+    try:
+        hog = cv2.HOGDescriptor()
+        hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+        resized = frame
+        height, width = resized.shape[:2]
+        if max(width, height) > 480:
+            scale = 480 / float(max(width, height))
+            resized = cv2.resize(resized, (int(width * scale), int(height * scale)), interpolation=cv2.INTER_AREA)
+        rects, _weights = hog.detectMultiScale(resized, winStride=(8, 8), padding=(8, 8), scale=1.08)
+        if len(rects) > 0:
+            return clamp(0.45 + min(0.45, len(rects) * 0.15))
+    except Exception:
+        pass
+    return 0.5
+
+
+def summarize_scene_safety(category: str, lighting: float, visibility: float, obstruction: float, motion: float) -> str:
+    if category in {"high", "critical"}:
+        return "Scene-risk proxy is elevated because the frame has weak visual conditions that can reduce navigation confidence."
+    if lighting > 0.62 and visibility > 0.55 and obstruction < 0.35:
+        return "Scene-risk proxy is controlled: lighting, visibility, and obstruction uncertainty look acceptable in this frame."
+    if motion > 0.65:
+        return "Scene-risk proxy is mixed: motion is high, so SafeNav treats this segment as more dynamic."
+    return "Scene-risk proxy is moderate: SafeNav can use this frame, but some visual conditions add uncertainty."
+
+
+def demo_scene_safety() -> dict[str, Any]:
+    return {
+        "lightingScore": 0.68,
+        "visibilityScore": 0.72,
+        "motionScore": 0.22,
+        "crowdScore": 0.5,
+        "obstructionScore": 0.18,
+        "sceneRiskScore": 0.294,
+        "sceneRiskCategory": "medium",
+        "sceneRiskExplanation": "Risk is moderate because perception signals are mixed, with no single dominant hazard.",
+        "safetySummary": "Scene-risk proxy is moderate: SafeNav can use this frame, but some visual conditions add uncertainty.",
+    }
+
+
 def pose_payload(index: int, position: Any, rotation: Any) -> dict[str, Any]:
     return {
         "index": index,
@@ -509,6 +595,7 @@ def demo_keyframe_instances() -> list[dict[str, Any]]:
             "matchesToNext": 240 + index * 35,
             "inliersToNext": 150 + index * 28,
             "decision": describe_pair_decision(240 + index * 35, 150 + index * 28),
+            "sceneSafety": demo_scene_safety(),
         }
         for index in range(4)
     ]

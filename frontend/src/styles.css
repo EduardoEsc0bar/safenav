@@ -554,6 +554,27 @@ select {
   color: #4e6156;
 }
 
+.instanceMetrics .riskBadge {
+  border-color: #ead39d;
+  background: #fff8e8;
+  color: #7a5a17;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.instanceMetrics .riskBadge.low {
+  border-color: #b9dfc4;
+  background: #f0fbf3;
+  color: #1f6f4a;
+}
+
+.instanceMetrics .riskBadge.high,
+.instanceMetrics .riskBadge.critical {
+  border-color: #e3b7b2;
+  background: #fff4f2;
+  color: #9b2f25;
+}
+
 .instanceDecision {
   margin: 0;
   color: #536159;
@@ -586,6 +607,10 @@ select {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+}
+
+.sceneGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .metric {
@@ -677,7 +702,8 @@ select {
 
   .mainColumn > .mappingPanel .featureGrid,
   .mainColumn > .mappingPanel .instanceStrip,
-  .inspectionGrid {
+  .inspectionGrid,
+  .sceneGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -699,7 +725,8 @@ select {
   .mainColumn > .mappingPanel .featureGrid,
   .mainColumn > .mappingPanel .instanceStrip,
   .mainColumn > .mappingPanel .buttonGrid.compact,
-  .inspectionGrid {
+  .inspectionGrid,
+  .sceneGrid {
     grid-template-columns: 1fr;
   }
 

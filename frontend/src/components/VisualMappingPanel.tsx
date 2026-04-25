@@ -162,6 +162,9 @@ function KeyframeInstances({ instances }: { instances: KeyframeInstance[] }) {
                 <span>KP {instance.keypoints}</span>
                 <span>Matches {instance.matchesToNext}</span>
                 <span>Inliers {instance.inliersToNext}</span>
+                <span className={`riskBadge ${instance.sceneSafety?.sceneRiskCategory ?? "medium"}`}>
+                  Risk {instance.sceneSafety?.sceneRiskCategory ?? "medium"}
+                </span>
               </span>
               <span className="instanceDecision">{instance.decision}</span>
             </span>
@@ -177,6 +180,7 @@ function KeyframeInspection({ instance }: { instance: KeyframeInstance }) {
   const matchSupport = instance.matchesToNext > 0 ? instance.inliersToNext / instance.matchesToNext : 0;
   const featureQuality = instance.keypoints >= 900 ? "high" : instance.keypoints >= 450 ? "moderate" : "low";
   const geometryQuality = matchSupport >= 0.45 ? "strong" : matchSupport >= 0.2 ? "usable" : "weak";
+  const scene = instance.sceneSafety;
   const safetySignal =
     geometryQuality === "strong"
       ? "Mapping confidence is strong here, so SafeNav can trust the local camera motion estimate and avoid adding uncertainty-based risk."
@@ -196,8 +200,19 @@ function KeyframeInspection({ instance }: { instance: KeyframeInstance }) {
         <Metric label="Inlier ratio" value={`${Math.round(matchSupport * 100)}%`} />
         <Metric label="Pose signal" value={instance.inliersToNext >= 25 ? "accepted" : "uncertain"} />
       </div>
+      <div className="inspectionGrid sceneGrid">
+        <Metric label="Scene risk" value={`${scene.sceneRiskCategory} (${scene.sceneRiskScore.toFixed(2)})`} />
+        <Metric label="Lighting" value={scene.lightingScore.toFixed(2)} />
+        <Metric label="Visibility" value={scene.visibilityScore.toFixed(2)} />
+        <Metric label="Obstruction" value={scene.obstructionScore.toFixed(2)} />
+        <Metric label="Motion" value={scene.motionScore.toFixed(2)} />
+        <Metric label="Pedestrian proxy" value={scene.crowdScore.toFixed(2)} />
+      </div>
       <p>
         This frame tells SafeNav how much visual structure was available at this moment in the video. ORB keypoints measure visible texture and corners, matches connect this frame to the next sampled view, and RANSAC inliers are the matches that agree with one camera-motion model.
+      </p>
+      <p>
+        Scene-risk proxy: {scene.safetySummary} {scene.sceneRiskExplanation}
       </p>
       <p>
         {safetySignal}
