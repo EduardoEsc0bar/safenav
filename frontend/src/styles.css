@@ -1245,6 +1245,21 @@ input[type="range"] {
   text-transform: uppercase;
 }
 
+.hudNavLinks button {
+  min-height: auto;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.hudNavLinks button:hover {
+  color: #ccff00;
+  background: transparent;
+}
+
 .hudNavActions {
   gap: 14px;
 }
@@ -1430,6 +1445,7 @@ input[type="range"] {
     radial-gradient(circle at 50% 56%, rgba(207, 255, 0, 0.12), transparent 180px),
     linear-gradient(90deg, rgba(0, 9, 10, 0.98), rgba(2, 13, 15, 0.82) 42%, rgba(1, 5, 7, 0.98)),
     #010405;
+  scroll-margin-top: 86px;
 }
 
 .hudHero::before,
@@ -1741,11 +1757,114 @@ input[type="range"] {
   color: #ccff00;
 }
 
+.howItWorksPanel {
+  scroll-margin-top: 86px;
+  margin: 14px clamp(24px, 3.9vw, 60px) 0;
+  border: 1px solid rgba(235, 235, 224, 0.16);
+  background:
+    radial-gradient(circle at 18% 32%, rgba(207, 255, 0, 0.1), transparent 260px),
+    linear-gradient(135deg, rgba(5, 15, 17, 0.94), rgba(1, 5, 6, 0.98));
+  padding: clamp(22px, 3vw, 34px);
+}
+
+.howItWorksHeader {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.72fr) minmax(320px, 1fr);
+  gap: 8px 42px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.howItWorksHeader span {
+  color: #ccff00;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.howItWorksHeader h2 {
+  grid-row: 2;
+  margin: 0;
+  color: #f3f3ed;
+  font-size: clamp(2.5rem, 5vw, 5.4rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.howItWorksHeader p {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  max-width: 760px;
+  margin: 0;
+  color: #aeb3ae;
+  font-size: 1rem;
+  line-height: 1.58;
+}
+
+.howItWorksGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid rgba(235, 235, 224, 0.12);
+}
+
+.howItWorksGrid article {
+  min-width: 0;
+  padding: 20px;
+  border-left: 1px solid rgba(235, 235, 224, 0.1);
+}
+
+.howItWorksGrid article:first-child {
+  border-left: 0;
+}
+
+.howItWorksGrid span {
+  color: #7f8580;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+.howItWorksGrid strong {
+  display: block;
+  min-height: 46px;
+  margin-top: 12px;
+  color: #f3f3ed;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.howItWorksGrid p {
+  margin: 14px 0 0;
+  color: #9da39e;
+  line-height: 1.48;
+}
+
+.howItWorksTrace {
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr auto 1fr auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  color: #f3f3ed;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.howItWorksTrace i {
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, #28ff75, #ccff00, #ff3028);
+}
+
 .hudWorkflow {
   display: grid;
   grid-template-columns: minmax(230px, 0.9fr) minmax(230px, 0.8fr) minmax(360px, 1.55fr) minmax(230px, 0.85fr);
   gap: 12px;
   margin: 14px clamp(24px, 3.9vw, 60px) 0;
+  scroll-margin-top: 86px;
 }
 
 .hudCard {
@@ -2099,6 +2218,24 @@ input[type="range"] {
     min-height: 360px;
   }
 
+  .howItWorksHeader,
+  .howItWorksGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .howItWorksHeader p {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .howItWorksGrid article:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .howItWorksGrid article:nth-child(n + 3) {
+    border-top: 1px solid rgba(235, 235, 224, 0.1);
+  }
+
   .mappingStatsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2243,6 +2380,40 @@ input[type="range"] {
 
   .hudHeroCopy h1 {
     font-size: clamp(3.3rem, 17vw, 4.8rem);
+  }
+
+  .howItWorksPanel {
+    margin-left: 18px;
+    margin-right: 18px;
+    padding: 20px;
+  }
+
+  .howItWorksHeader,
+  .howItWorksGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .howItWorksHeader h2 {
+    grid-row: auto;
+  }
+
+  .howItWorksGrid article,
+  .howItWorksGrid article:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .howItWorksGrid article + article {
+    border-top: 1px solid rgba(235, 235, 224, 0.1);
+  }
+
+  .howItWorksTrace {
+    grid-template-columns: 1fr;
+  }
+
+  .howItWorksTrace i {
+    height: 18px;
+    width: 2px;
+    justify-self: start;
   }
 
   .hudHeroActions,

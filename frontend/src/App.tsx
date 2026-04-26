@@ -32,6 +32,7 @@ export default function App() {
   const [liveMode, setLiveMode] = useState(false);
   const [error, setError] = useState("");
   const visualRef = useRef<HTMLElement | null>(null);
+  const howItWorksRef = useRef<HTMLElement | null>(null);
   const workflowRef = useRef<HTMLElement | null>(null);
 
   const selectedNode = useMemo(() => graph.nodes.find((node) => node.id === selectedNodeId) ?? null, [graph.nodes, selectedNodeId]);
@@ -43,6 +44,12 @@ export default function App() {
   const scrollToWorkflow = useCallback(() => {
     window.requestAnimationFrame(() => {
       workflowRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, []);
+
+  const scrollToHowItWorks = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      howItWorksRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }, []);
 
@@ -229,7 +236,7 @@ export default function App() {
           <span>SAFENAV</span>
         </div>
         <nav className="hudNavLinks" aria-label="SafeNav sections">
-          <span>How It Works</span>
+          <button type="button" onClick={scrollToHowItWorks}>How It Works</button>
           <span>Campus Safety</span>
           <span>For Cities</span>
           <span>About</span>
@@ -249,7 +256,7 @@ export default function App() {
           <p>SafeNav uses camera-based perception, visual mapping, and risk-aware routing to guide students across campus at night.</p>
           <div className="pathHomeActions">
             <button type="button" onClick={scrollToVisualMapping}>Find Your Safe Route <ArrowUpRight size={17} /></button>
-            <button type="button" onClick={scrollToWorkflow}>See How It Works <Circle size={15} /></button>
+            <button type="button" onClick={scrollToHowItWorks}>See How It Works <Circle size={15} /></button>
           </div>
         </div>
         <aside className="pathHomeCard">
@@ -293,6 +300,47 @@ export default function App() {
             slamProcessing={slamProcessing}
             slamResult={slamResult}
           />
+        </div>
+      </section>
+
+      <section className="howItWorksPanel" ref={howItWorksRef}>
+        <div className="howItWorksHeader">
+          <span>System Pipeline</span>
+          <h2>How SafeNav Works</h2>
+          <p>SafeNav treats a walking route like a small autonomy problem: video becomes perception features, features update risk, risk updates the graph, and planners recompute the safer path.</p>
+        </div>
+        <div className="howItWorksGrid">
+          <article>
+            <span>01</span>
+            <strong>Upload or simulate sensor input</strong>
+            <p>A campus walk video is sampled into keyframes so the demo can inspect lighting, blur, motion, and visual texture over time.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <strong>Estimate camera motion</strong>
+            <p>ORB features are matched between frames, RANSAC filters outliers, and SLAM-lite estimates pose plus sparse 3D structure.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <strong>Convert perception into risk</strong>
+            <p>Lighting, visibility, obstruction, crowd proxy, motion, and map confidence are converted into a plain-English safety signal.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <strong>Replan on the campus graph</strong>
+            <p>Dijkstra and A* compare distance against dynamic risk, avoid blocked paths, and expose latency, visited nodes, and reroute counts.</p>
+          </article>
+        </div>
+        <div className="howItWorksTrace">
+          <span>Video</span>
+          <i />
+          <span>Perception</span>
+          <i />
+          <span>Risk</span>
+          <i />
+          <span>Graph</span>
+          <i />
+          <span>Route</span>
         </div>
       </section>
 
