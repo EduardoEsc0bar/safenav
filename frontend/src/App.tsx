@@ -31,6 +31,7 @@ export default function App() {
   const [slamFileName, setSlamFileName] = useState("");
   const [liveMode, setLiveMode] = useState(false);
   const [error, setError] = useState("");
+  const visualRef = useRef<HTMLElement | null>(null);
   const workflowRef = useRef<HTMLElement | null>(null);
 
   const selectedNode = useMemo(() => graph.nodes.find((node) => node.id === selectedNodeId) ?? null, [graph.nodes, selectedNodeId]);
@@ -42,6 +43,12 @@ export default function App() {
   const scrollToWorkflow = useCallback(() => {
     window.requestAnimationFrame(() => {
       workflowRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, []);
+
+  const scrollToVisualMapping = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      visualRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }, []);
 
@@ -222,21 +229,38 @@ export default function App() {
           <span>SAFENAV</span>
         </div>
         <nav className="hudNavLinks" aria-label="SafeNav sections">
-          <span>Platform</span>
-          <span>Technology</span>
-          <span>Solutions</span>
-          <span>Resources</span>
-          <span>Company</span>
+          <span>How It Works</span>
+          <span>Campus Safety</span>
+          <span>For Cities</span>
+          <span>About</span>
+          <span>Contact</span>
         </nav>
         <div className="hudNavActions">
           <button type="button" onClick={computeRoute}>Log In</button>
-          <button className="hudAccentButton" type="button" onClick={runSlamDemo}>Get Started <ArrowUpRight size={16} /></button>
+          <button className="hudAccentButton" type="button" onClick={scrollToVisualMapping}>Get Started <ArrowUpRight size={16} /></button>
         </div>
       </header>
 
       {error && <div className="errorBanner">{error}</div>}
 
-      <section className="hudHero">
+      <section className="pathHomeHero">
+        <div className="pathHomeCopy">
+          <h1>Your safest path home.</h1>
+          <p>SafeNav uses camera-based perception, visual mapping, and risk-aware routing to guide students across campus at night.</p>
+          <div className="pathHomeActions">
+            <button type="button" onClick={scrollToVisualMapping}>Find Your Safe Route <ArrowUpRight size={17} /></button>
+            <button type="button" onClick={scrollToWorkflow}>See How It Works <Circle size={15} /></button>
+          </div>
+        </div>
+        <aside className="pathHomeCard">
+          <div className="miniBrand"><Shield size={19} /> SafeNav</div>
+          <h2>Safety first, always.</h2>
+          <p>Upload a campus walk. SafeNav turns visual evidence into route risk, confidence, and a safer path decision.</p>
+          <button type="button" onClick={scrollToVisualMapping}>Learn more <ArrowUpRight size={16} /></button>
+        </aside>
+      </section>
+
+      <section className="hudHero" ref={visualRef}>
         <div className="hudHeroCopy">
           <p className="hudStep"><strong>01</strong> / Analyze Environment</p>
           <h1>Visual Mapping Mode</h1>

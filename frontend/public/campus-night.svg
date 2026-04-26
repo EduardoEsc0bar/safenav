@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 760" role="img" aria-label="Night campus walkway">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#06111c"/>
+      <stop offset="0.5" stop-color="#09131b"/>
+      <stop offset="1" stop-color="#03060a"/>
+    </linearGradient>
+    <radialGradient id="lampGlow" cx="50%" cy="40%" r="55%">
+      <stop offset="0" stop-color="#fff2c4" stop-opacity="0.88"/>
+      <stop offset="0.28" stop-color="#ffd979" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#ffd979" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="walkway" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#2b3440" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#0a0f14" stop-opacity="0.86"/>
+    </linearGradient>
+    <filter id="softBlur">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+  </defs>
+  <rect width="1800" height="760" fill="url(#sky)"/>
+  <rect y="390" width="1800" height="370" fill="#07100c"/>
+  <path d="M830 380h300l260 380H555z" fill="url(#walkway)" opacity="0.72"/>
+  <path d="M900 380l-95 380M1040 380l145 380" stroke="#c6c0ad" stroke-opacity="0.13" stroke-width="3"/>
+  <g opacity="0.86">
+    <rect x="118" y="148" width="420" height="264" fill="#11151a"/>
+    <rect x="138" y="124" width="380" height="36" fill="#171c22"/>
+    <rect x="165" y="184" width="46" height="50" fill="#ffc86a" opacity="0.35"/>
+    <rect x="245" y="184" width="46" height="50" fill="#ffc86a" opacity="0.55"/>
+    <rect x="325" y="184" width="46" height="50" fill="#ffc86a" opacity="0.22"/>
+    <rect x="405" y="184" width="46" height="50" fill="#ffc86a" opacity="0.42"/>
+    <rect x="165" y="274" width="46" height="50" fill="#ffc86a" opacity="0.22"/>
+    <rect x="245" y="274" width="46" height="50" fill="#ffc86a" opacity="0.5"/>
+    <rect x="325" y="274" width="46" height="50" fill="#ffc86a" opacity="0.32"/>
+    <rect x="405" y="274" width="46" height="50" fill="#ffc86a" opacity="0.25"/>
+  </g>
+  <g opacity="0.86">
+    <rect x="1268" y="132" width="388" height="282" fill="#10141a"/>
+    <rect x="1300" y="106" width="324" height="34" fill="#171c22"/>
+    <rect x="1318" y="178" width="44" height="52" fill="#ffc86a" opacity="0.38"/>
+    <rect x="1394" y="178" width="44" height="52" fill="#ffc86a" opacity="0.18"/>
+    <rect x="1470" y="178" width="44" height="52" fill="#ffc86a" opacity="0.48"/>
+    <rect x="1546" y="178" width="44" height="52" fill="#ffc86a" opacity="0.3"/>
+    <rect x="1318" y="270" width="44" height="52" fill="#ffc86a" opacity="0.3"/>
+    <rect x="1394" y="270" width="44" height="52" fill="#ffc86a" opacity="0.46"/>
+    <rect x="1470" y="270" width="44" height="52" fill="#ffc86a" opacity="0.22"/>
+    <rect x="1546" y="270" width="44" height="52" fill="#ffc86a" opacity="0.54"/>
+  </g>
+  <g opacity="0.7">
+    <path d="M620 432c-75-84-50-168 44-208 55 58 40 136-44 208z" fill="#1e2a16"/>
+    <path d="M1192 432c72-88 42-174-52-214-48 62-34 140 52 214z" fill="#1e2a16"/>
+    <path d="M676 418c-38-94 4-172 112-196 36 76 2 148-112 196z" fill="#172614"/>
+    <path d="M1120 418c42-94 0-174-108-198-38 76-4 150 108 198z" fill="#172614"/>
+  </g>
+  <g>
+    <rect x="896" y="220" width="10" height="210" fill="#1e252b"/>
+    <ellipse cx="901" cy="214" rx="28" ry="11" fill="#d6d6cc"/>
+    <circle cx="901" cy="222" r="76" fill="url(#lampGlow)" filter="url(#softBlur)"/>
+    <rect x="1064" y="292" width="8" height="138" fill="#1e252b"/>
+    <ellipse cx="1068" cy="288" rx="20" ry="8" fill="#d6d6cc"/>
+    <circle cx="1068" cy="296" r="58" fill="url(#lampGlow)" filter="url(#softBlur)"/>
+    <rect x="1208" y="322" width="7" height="118" fill="#1e252b"/>
+    <ellipse cx="1211" cy="318" rx="17" ry="7" fill="#d6d6cc"/>
+    <circle cx="1211" cy="326" r="48" fill="url(#lampGlow)" filter="url(#softBlur)"/>
+  </g>
+  <rect width="1800" height="760" fill="#000" opacity="0.22"/>
+</svg>
