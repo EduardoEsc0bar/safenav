@@ -2203,6 +2203,14 @@ input[type="range"] {
   padding: 0 22px;
 }
 
+.routeSummaryStage {
+  align-self: start;
+}
+
+.mainColumn {
+  scroll-margin-top: 86px;
+}
+
 .hudFeatureStrip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

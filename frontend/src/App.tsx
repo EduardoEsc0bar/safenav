@@ -34,6 +34,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<"home" | "how">("home");
   const visualRef = useRef<HTMLElement | null>(null);
   const workflowRef = useRef<HTMLElement | null>(null);
+  const routeMapRef = useRef<HTMLDivElement | null>(null);
 
   const selectedNode = useMemo(() => graph.nodes.find((node) => node.id === selectedNodeId) ?? null, [graph.nodes, selectedNodeId]);
   const safetyScore = summary ? Math.max(0, 10 - summary.overall_risk * 10) : 8.7;
@@ -86,6 +87,13 @@ export default function App() {
     setMetrics(response.metrics);
     setSummary(response.summary);
   }, [algorithm, endId, riskWeight, startId]);
+
+  const viewSafeRoute = useCallback(async () => {
+    await computeRoute();
+    window.requestAnimationFrame(() => {
+      routeMapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [computeRoute]);
 
   useEffect(() => {
     loadGraph()
@@ -377,7 +385,7 @@ export default function App() {
             <strong>{safetyScore.toFixed(1)}<small>/10</small></strong>
             <em>{safetyLabel}</em>
           </div>
-          <button type="button" onClick={computeRoute}>View Safe Route <ArrowUpRight size={17} /></button>
+          <button type="button" onClick={viewSafeRoute}>View Safe Route <ArrowUpRight size={17} /></button>
         </article>
       </section>
 
@@ -389,7 +397,7 @@ export default function App() {
       </section>
 
       <div className="appGrid">
-        <div className="mainColumn">
+        <div className="mainColumn" ref={routeMapRef}>
           <CampusMap
             graph={graph}
             route={route}
