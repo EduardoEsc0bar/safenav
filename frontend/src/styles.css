@@ -1279,9 +1279,9 @@ input[type="range"] {
   position: relative;
   display: grid;
   grid-template-columns: minmax(430px, 0.39fr) minmax(0, 1fr);
-  min-height: 428px;
+  min-height: 358px;
   margin: 0 clamp(24px, 3.9vw, 60px);
-  padding: 34px 28px 14px;
+  padding: 28px 28px 8px;
   border: 1px solid rgba(235, 235, 224, 0.14);
   border-top: 0;
   overflow: hidden;
@@ -1340,7 +1340,7 @@ input[type="range"] {
 }
 
 .hudHeroCopy h1 {
-  margin: 20px 0 0;
+  margin: 16px 0 0;
   max-width: 690px;
   color: #f3f3ed;
   font-family: Impact, Haettenschweiler, "Arial Narrow Bold", Inter, sans-serif;
@@ -1355,14 +1355,14 @@ input[type="range"] {
   color: #aeb3ae;
   font-size: 0.98rem;
   line-height: 1.5;
-  margin: 18px 0 0;
+  margin: 14px 0 0;
 }
 
 .hudHeroActions {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  margin-top: 24px;
+  margin-top: 20px;
 }
 
 .hudHeroActions button,
@@ -1374,18 +1374,18 @@ input[type="range"] {
 
 .hudFormats {
   display: block;
-  margin-top: 18px;
+  margin-top: 14px;
   line-height: 1.55;
 }
 
 .hudMapStage {
-  min-height: 372px;
+  min-height: 300px;
 }
 
 .hudBlueprint {
   width: 100%;
   height: 100%;
-  min-height: 372px;
+  min-height: 300px;
 }
 
 .wireBuilding {

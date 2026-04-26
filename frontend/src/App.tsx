@@ -409,10 +409,10 @@ function HudProcessStep({ label, done, active }: { label: string; done?: boolean
 
 function HudRouteBlueprint() {
   const dots = [
-    [23, 48, "green"], [27, 49, "green"], [31, 50, "green"], [35, 52, "green"], [39, 55, "green"],
-    [44, 59, "yellow"], [49, 59, "yellow"], [54, 58, "yellow"], [59, 57, "yellow"], [64, 57, "yellow"],
-    [69, 55, "orange"], [73, 53, "orange"], [77, 52, "orange"], [81, 54, "red"], [84, 59, "red"],
-    [86, 65, "red"], [89, 71, "red"], [92, 76, "red"]
+    [23, 42, "green"], [27, 43, "green"], [31, 44, "green"], [35, 46, "green"], [39, 49, "green"],
+    [44, 53, "yellow"], [49, 53, "yellow"], [54, 52, "yellow"], [59, 51, "yellow"], [64, 51, "yellow"],
+    [69, 49, "orange"], [73, 47, "orange"], [77, 46, "orange"], [81, 48, "red"], [84, 52, "red"],
+    [86, 57, "red"], [89, 62, "red"], [92, 66, "red"]
   ];
 
   return (
@@ -429,14 +429,14 @@ function HudRouteBlueprint() {
       {Array.from({ length: 30 }).map((_, index) => (
         <rect key={index} x={8 + (index % 10) * 9} y={10 + Math.floor(index / 10) * 20} width="5.5" height="8" className="wireBuilding" />
       ))}
-      <polyline points="23,48 31,50 39,55 44,59 54,58 64,57 73,53 81,54 86,65 92,76" className="routeGlow" />
+      <polyline points="23,42 31,44 39,49 44,53 54,52 64,51 73,47 81,48 86,57 92,66" className="routeGlow" />
       {dots.map(([x, y, color], index) => <circle key={`${x}-${y}-${index}`} cx={x} cy={y} r="0.95" className={`routeDot ${color}`} />)}
-      <circle cx="21" cy="47" r="2.9" className="startRing" />
-      <text x="18" y="55" className="mapLabel start">START</text>
-      <text x="18" y="59" className="mapLabel">STUDENT CENTER</text>
-      <circle cx="92" cy="76" r="2.9" className="endRing" />
-      <text x="90" y="85" className="mapLabel end">END</text>
-      <text x="90" y="89" className="mapLabel">DORMS</text>
+      <circle cx="21" cy="41" r="2.9" className="startRing" />
+      <text x="18" y="49" className="mapLabel start">START</text>
+      <text x="18" y="53" className="mapLabel">STUDENT CENTER</text>
+      <circle cx="92" cy="66" r="2.9" className="endRing" />
+      <text x="90" y="75" className="mapLabel end">END</text>
+      <text x="90" y="79" className="mapLabel">DORMS</text>
     </svg>
   );
 }
