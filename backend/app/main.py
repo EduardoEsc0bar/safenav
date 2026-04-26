@@ -21,6 +21,7 @@ app = FastAPI(title="SafeNav API", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):517[0-9]",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -125,7 +126,26 @@ def post_perception_apply(request: ApplyPerceptionRequest) -> dict[str, Any]:
 
 
 @app.post("/api/slam/upload-video")
-async def post_slam_upload_video(file: UploadFile = File(...), selected_node_id: str = Form("parking_lot")) -> dict[str, Any]:
+async def post_slam_upload_video(
+    file: UploadFile = File(...),
+    selected_node_id: str = Form("parking_lot"),
+    start_id: str | None = Form(default=None),
+    end_id: str | None = Form(default=None),
+    algorithm: str | None = Form(default=None),
+    risk_weight: float | None = Form(default=None),
+) -> dict[str, Any]:
+    global last_route_request
+    if start_id or end_id or algorithm or risk_weight is not None:
+        try:
+            last_route_request = RouteRequest(
+                start_id=start_id or last_route_request.start_id,
+                end_id=end_id or last_route_request.end_id,
+                algorithm=algorithm or last_route_request.algorithm,
+                risk_weight=risk_weight if risk_weight is not None else last_route_request.risk_weight,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     suffix = os.path.splitext(file.filename or "upload.mov")[1] or ".mov"
     temp_path = ""
     try:

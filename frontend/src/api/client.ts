@@ -29,10 +29,20 @@ export const api = {
   },
   applyPerception: (node_id: string, features: PerceptionFeatures) =>
     request("/api/perception/apply", { method: "POST", body: JSON.stringify({ node_id, features }) }),
-  slamUploadVideo: (file: File, selectedNodeId: string) => {
+  slamUploadVideo: (
+    file: File,
+    selectedNodeId: string,
+    route?: { start_id: string; end_id: string; algorithm: Algorithm; risk_weight: number }
+  ) => {
     const body = new FormData();
     body.append("file", file);
     body.append("selected_node_id", selectedNodeId);
+    if (route) {
+      body.append("start_id", route.start_id);
+      body.append("end_id", route.end_id);
+      body.append("algorithm", route.algorithm);
+      body.append("risk_weight", String(route.risk_weight));
+    }
     return request("/api/slam/upload-video", { method: "POST", body });
   },
   slamDemo: (selectedNodeId: string) => request(`/api/slam/demo?selected_node_id=${encodeURIComponent(selectedNodeId)}`)

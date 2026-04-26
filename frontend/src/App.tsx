@@ -13,6 +13,17 @@ import type { Algorithm, CampusGraph, PerceptionFeatures, RouteResult, RuntimeMe
 
 const initialGraph: CampusGraph = { nodes: [], edges: [] };
 
+type SimulationUpload = {
+  id: string;
+  fileName: string;
+  fileSizeMb: string;
+  description: string;
+  nodeName: string;
+  framesProcessed: number;
+  mapConfidence: number;
+  safetyScore: number;
+};
+
 export default function App() {
   const [graph, setGraph] = useState<CampusGraph>(initialGraph);
   const [summary, setSummary] = useState<SummaryMetrics | null>(null);
@@ -29,6 +40,11 @@ export default function App() {
   const [slamProcessing, setSlamProcessing] = useState(false);
   const [slamStatus, setSlamStatus] = useState("");
   const [slamFileName, setSlamFileName] = useState("");
+  const [simulationPendingFile, setSimulationPendingFile] = useState<File | null>(null);
+  const [simulationLocationId, setSimulationLocationId] = useState("parking_lot");
+  const [simulationDescription, setSimulationDescription] = useState("");
+  const [simulationUploads, setSimulationUploads] = useState<SimulationUpload[]>([]);
+  const [simulationProcessing, setSimulationProcessing] = useState(false);
   const [liveMode, setLiveMode] = useState(false);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState<"home" | "how">("home");
@@ -247,6 +263,68 @@ export default function App() {
     }
   };
 
+  const submitSimulationVideo = async () => {
+    if (!simulationPendingFile) return;
+
+    const uploadedFile = simulationPendingFile;
+    const uploadedDescription = simulationDescription.trim();
+    if (!uploadedDescription) return;
+    const targetNode = graph.nodes.find((node) => node.id === simulationLocationId);
+    setSimulationProcessing(true);
+    setSlamProcessing(true);
+    setSlamFileName(`${uploadedFile.name} (${(uploadedFile.size / (1024 * 1024)).toFixed(1)} MB)`);
+    setSlamStatus(`Processing simulation footage for ${targetNode?.name ?? "selected location"}`);
+    setEndId("dorms");
+    setSelectedNodeId(simulationLocationId);
+    scrollToWorkflow();
+
+    try {
+      const response = await api.slamUploadVideo(uploadedFile, simulationLocationId, {
+        start_id: startId,
+        end_id: "dorms",
+        algorithm,
+        risk_weight: riskWeight
+      }) as {
+        slam: SlamLiteResult;
+        graph: CampusGraph;
+        summary: SummaryMetrics;
+        route: RouteResult;
+        metrics: RuntimeMetrics;
+      };
+      const updatedSafetyScore = Math.max(0, 10 - response.summary.overall_risk * 10);
+      const updatedNode = response.graph.nodes.find((node) => node.id === simulationLocationId);
+      setSlamResult(response.slam);
+      setGraph(response.graph);
+      setSummary(response.summary);
+      setRoute(response.route);
+      setMetrics(response.metrics);
+      setEventExplanation(`Simulation footage described as "${uploadedDescription}" was mapped to ${updatedNode?.name ?? targetNode?.name ?? "the selected location"} and updated the safest route to the Dorms. ${response.slam.explanation}`);
+      setSlamStatus(response.slam.fallbackUsed ? "Simulation processed with fallback demo data" : "Simulation video processed");
+      setSimulationUploads((uploads) => [
+        {
+          id: `${Date.now()}-${uploadedFile.name}`,
+          fileName: uploadedFile.name,
+          fileSizeMb: (uploadedFile.size / (1024 * 1024)).toFixed(1),
+          description: uploadedDescription,
+          nodeName: updatedNode?.name ?? targetNode?.name ?? "Selected location",
+          framesProcessed: response.slam.framesProcessed,
+          mapConfidence: response.slam.mapConfidence,
+          safetyScore: updatedSafetyScore
+        },
+        ...uploads
+      ]);
+      setSimulationPendingFile(null);
+      setSimulationDescription("");
+      setError("");
+    } catch (err) {
+      setError(String(err));
+      setSlamStatus("Simulation video upload or processing failed");
+    } finally {
+      setSimulationProcessing(false);
+      setSlamProcessing(false);
+    }
+  };
+
   return (
     <main>
       <header className="hudNav">
@@ -428,7 +506,20 @@ export default function App() {
             onRiskWeightChange={setRiskWeight}
             onCompute={computeRoute}
           />
-          <SimulationPanel onSimulate={simulate} onReset={reset} />
+          <SimulationPanel
+            nodes={graph.nodes}
+            pendingFile={simulationPendingFile}
+            description={simulationDescription}
+            selectedNodeId={simulationLocationId}
+            uploads={simulationUploads}
+            processing={simulationProcessing}
+            onPendingFileChange={setSimulationPendingFile}
+            onDescriptionChange={setSimulationDescription}
+            onSelectedNodeChange={setSimulationLocationId}
+            onSubmitVideo={submitSimulationVideo}
+            onSimulate={simulate}
+            onReset={reset}
+          />
           <PerceptionPanel
             nodes={graph.nodes}
             selectedNodeId={selectedNodeId}

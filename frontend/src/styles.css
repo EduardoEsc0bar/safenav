@@ -575,6 +575,183 @@ h2 {
   display: none;
 }
 
+.simulationLaunch {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.simulationPending {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  border: 1px solid #33332f;
+  background: #080808;
+  padding: 10px 12px;
+}
+
+.simulationPending.compact {
+  margin-bottom: 0;
+}
+
+.simulationPending.success {
+  border-color: #2d7b4c;
+  background: #06150c;
+}
+
+.simulationPending strong,
+.simulationPending span,
+.simulationHistory strong,
+.simulationHistory span,
+.simulationHistory small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.simulationPending strong,
+.simulationHistory strong {
+  color: #f4f4f0;
+  font-size: 0.78rem;
+}
+
+.simulationPending span,
+.simulationHistory span,
+.simulationHistory small {
+  margin-top: 3px;
+  color: #9c9c94;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.simulationHistory small {
+  color: #c9c9c0;
+}
+
+.simulationHistory {
+  display: grid;
+  gap: 8px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.simulationHistory article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #2a2a26;
+  background: #050505;
+  padding: 10px;
+}
+
+.simulationHistory em {
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.simulationModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 3vw, 42px);
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(10px);
+}
+
+.simulationModal {
+  width: min(1120px, 100%);
+  max-height: min(840px, calc(100vh - 32px));
+  overflow: auto;
+  border: 1px solid #3a3a36;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    #020202;
+  background-size: 36px 36px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.62);
+}
+
+.simulationModalHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: clamp(18px, 2.6vw, 30px);
+  border-bottom: 1px solid #2a2a26;
+}
+
+.simulationModalHeader h2 {
+  font-size: clamp(1.8rem, 4vw, 3.8rem);
+  line-height: 0.92;
+}
+
+.simulationModalGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(290px, 0.8fr);
+  gap: 18px;
+  padding: clamp(18px, 2.6vw, 30px);
+}
+
+.simulationModalMain,
+.simulationDescriptionStep,
+.simulationModalSide {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.simulationDropZone {
+  min-height: 250px;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  border: 1px dashed #5a5a52;
+  background: rgba(8, 8, 8, 0.92);
+  color: #f4f4f0;
+  cursor: pointer;
+  text-align: center;
+}
+
+.simulationDropZone:hover,
+.simulationDropZone.uploaded {
+  border-color: #f4f4f0;
+}
+
+.simulationDropZone strong {
+  max-width: min(520px, 92%);
+  overflow-wrap: anywhere;
+  color: #ffffff;
+  font-size: clamp(1rem, 2vw, 1.4rem);
+}
+
+.simulationDropZone span {
+  color: #9c9c94;
+  font-size: 0.82rem;
+}
+
+.simulationDropZone input {
+  display: none;
+}
+
+.simulationHistory.large {
+  max-height: 540px;
+}
+
+.simulationEmptyState {
+  border: 1px solid #2a2a26;
+  background: #050505;
+  color: #9c9c94;
+  padding: 14px;
+  font-size: 0.78rem;
+}
+
 label {
   display: grid;
   gap: 8px;
@@ -586,7 +763,8 @@ label {
 }
 
 select,
-input[type="range"] {
+input[type="range"],
+textarea {
   width: 100%;
 }
 
@@ -597,6 +775,21 @@ select {
   background: #060606;
   color: #f4f4f0;
   padding: 0 10px;
+}
+
+textarea {
+  min-height: 130px;
+  resize: vertical;
+  border: 1px solid #33332f;
+  border-radius: 2px;
+  background: #060606;
+  color: #f4f4f0;
+  padding: 12px;
+  line-height: 1.45;
+}
+
+textarea::placeholder {
+  color: #77776f;
 }
 
 input[type="range"] {
@@ -694,7 +887,7 @@ input[type="range"] {
     linear-gradient(rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.48)),
     linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    url("/campus-map.jpg"),
+    url("/campus-map.png"),
     #050505;
   background-position: center, center, center, center, center;
   background-repeat: no-repeat, repeat, repeat, no-repeat, no-repeat;
@@ -2487,6 +2680,10 @@ input[type="range"] {
   .keyframePreviewPane .instancePlaceholder {
     max-height: 48vh;
   }
+
+  .simulationModalGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 720px) {
@@ -2752,5 +2949,27 @@ input[type="range"] {
 
   .appGrid {
     padding: 0 18px 36px;
+  }
+
+  .simulationModalBackdrop {
+    padding: 10px;
+  }
+
+  .simulationModal {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+  }
+
+  .simulationModalHeader,
+  .simulationModalGrid {
+    padding: 14px;
+  }
+
+  .simulationDropZone {
+    min-height: 190px;
+  }
+
+  .simulationHistory article {
+    grid-template-columns: 1fr;
   }
 }
