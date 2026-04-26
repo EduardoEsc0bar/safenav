@@ -674,22 +674,72 @@ input[type="range"] {
   min-height: 640px;
 }
 
-.campusMap {
+.mapSubcopy {
+  display: block;
+  max-width: 660px;
+  margin-top: 8px;
+  color: #9c9c94;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.campusMapFrame {
+  position: relative;
   width: 100%;
   height: min(68vh, 690px);
   min-height: 560px;
   border: 1px solid #2a2a26;
   border-radius: 0;
   background:
+    linear-gradient(rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.48)),
     linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    url("/campus-map.png"),
     #050505;
-  background-size: 20px 20px;
+  background-position: center, center, center, center, center;
+  background-repeat: no-repeat, repeat, repeat, no-repeat, no-repeat;
+  background-size: auto, 20px 20px, 20px 20px, cover, auto;
+  overflow: hidden;
+}
+
+.campusMapFrame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 55% 45%, transparent 0 44%, rgba(0, 0, 0, 0.28) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.24));
+}
+
+.campusMap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+}
+
+.mapAttribution {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  z-index: 2;
+  border: 1px solid rgba(244, 244, 240, 0.16);
+  background: rgba(0, 0, 0, 0.62);
+  color: #c8cbc3;
+  padding: 7px 9px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .edge {
   stroke-linecap: square;
-  opacity: 0.88;
+  opacity: 0.92;
+  paint-order: stroke;
+  stroke: currentColor;
 }
 
 .routeEdge {
@@ -717,11 +767,11 @@ input[type="range"] {
 }
 
 .nodeLabel {
-  font-size: 2.35px;
+  font-size: 2.1px;
   fill: #f4f4f0;
   paint-order: stroke;
   stroke: #000000;
-  stroke-width: 0.95px;
+  stroke-width: 1.25px;
   stroke-linejoin: round;
 }
 
@@ -733,21 +783,25 @@ input[type="range"] {
 }
 
 .risk-low {
+  color: #50d878;
   stroke: #50d878;
   fill: #50d878;
 }
 
 .risk-medium {
+  color: #f0b341;
   stroke: #f0b341;
   fill: #f0b341;
 }
 
 .risk-high {
+  color: #ff4a3f;
   stroke: #ff4a3f;
   fill: #ff4a3f;
 }
 
 .risk-blocked {
+  color: #77776f;
   stroke: #77776f;
   fill: #77776f;
   stroke-dasharray: 2 2;

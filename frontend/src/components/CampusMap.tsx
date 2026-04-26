@@ -33,7 +33,8 @@ export function CampusMap({ graph, route, startId, endId, onSelectNode, selected
       <div className="sectionHeader">
         <div>
           <p className="eyebrow">World model</p>
-          <h2>Campus Graph</h2>
+          <h2>Campus Map Overlay</h2>
+          <span className="mapSubcopy">Graph nodes are projected onto the real campus map so uploaded videos can update specific route segments.</span>
         </div>
         <div className="legend">
           <span><i className="dot low" />Low</span>
@@ -42,45 +43,48 @@ export function CampusMap({ graph, route, startId, endId, onSelectNode, selected
           <span><i className="dot blocked" />Blocked</span>
         </div>
       </div>
-      <svg className="campusMap" viewBox="0 0 104 100" role="img" aria-label="Campus graph visualization">
-        <defs>
-          <filter id="routeGlow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="1.1" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-        {graph.edges.map((edge) => {
-          const from = nodesById.get(edge.from)!;
-          const to = nodesById.get(edge.to)!;
-          const onRoute = routeEdges.has(edge.id);
-          return (
-            <line
-              key={edge.id}
-              x1={from.x}
-              y1={from.y}
-              x2={to.x}
-              y2={to.y}
-              className={`edge ${riskClass(edge.risk_category, edge.status)} ${onRoute ? "routeEdge" : ""}`}
-              strokeWidth={onRoute ? 2.9 : 1.2}
-              filter={onRoute ? "url(#routeGlow)" : undefined}
+      <div className="campusMapFrame">
+        <svg className="campusMap" viewBox="0 0 104 100" role="img" aria-label="Campus graph overlay on real map">
+          <defs>
+            <filter id="routeGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="1.1" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          {graph.edges.map((edge) => {
+            const from = nodesById.get(edge.from)!;
+            const to = nodesById.get(edge.to)!;
+            const onRoute = routeEdges.has(edge.id);
+            return (
+              <line
+                key={edge.id}
+                x1={from.x}
+                y1={from.y}
+                x2={to.x}
+                y2={to.y}
+                className={`edge ${riskClass(edge.risk_category, edge.status)} ${onRoute ? "routeEdge" : ""}`}
+                strokeWidth={onRoute ? 2.9 : 1.2}
+                filter={onRoute ? "url(#routeGlow)" : undefined}
+              />
+            );
+          })}
+          {graph.nodes.map((node) => (
+            <NodeMarker
+              key={node.id}
+              node={node}
+              isStart={node.id === startId}
+              isEnd={node.id === endId}
+              isRoute={Boolean(route?.routeNodeIds.includes(node.id))}
+              isSelected={node.id === selectedNodeId}
+              onSelectNode={onSelectNode}
             />
-          );
-        })}
-        {graph.nodes.map((node) => (
-          <NodeMarker
-            key={node.id}
-            node={node}
-            isStart={node.id === startId}
-            isEnd={node.id === endId}
-            isRoute={Boolean(route?.routeNodeIds.includes(node.id))}
-            isSelected={node.id === selectedNodeId}
-            onSelectNode={onSelectNode}
-          />
-        ))}
-      </svg>
+          ))}
+        </svg>
+        <div className="mapAttribution">Campus satellite overlay / demo graph projection</div>
+      </div>
     </section>
   );
 }
