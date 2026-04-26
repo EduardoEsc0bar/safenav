@@ -1203,14 +1203,14 @@ input[type="range"] {
 
 /* HUD launch experience */
 .hudNav {
-  height: 80px;
+  height: 72px;
   border-bottom: 1px solid rgba(199, 255, 0, 0.16);
   background: rgba(1, 6, 7, 0.94);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 28px;
-  padding: 0 clamp(22px, 3.8vw, 54px);
+  gap: 24px;
+  padding: 0 clamp(24px, 3.9vw, 60px);
   position: sticky;
   top: 0;
   z-index: 30;
@@ -1224,9 +1224,9 @@ input[type="range"] {
 }
 
 .hudBrand {
-  gap: 12px;
+  gap: 10px;
   color: #f7f7f2;
-  font-size: 1.45rem;
+  font-size: 1.18rem;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -1237,11 +1237,11 @@ input[type="range"] {
 
 .hudNavLinks {
   justify-content: center;
-  gap: clamp(24px, 4vw, 64px);
+  gap: clamp(28px, 4.1vw, 66px);
   color: #d7d9d1;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -1253,12 +1253,12 @@ input[type="range"] {
 .hudHeroActions button,
 .hudAccentButton,
 .routeSummaryStage button {
-  min-height: 48px;
+  min-height: 44px;
   border-color: rgba(235, 235, 224, 0.24);
   background: rgba(0, 0, 0, 0.42);
   color: #f7f7f2;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
 .hudAccentButton,
@@ -1278,10 +1278,10 @@ input[type="range"] {
 .hudHero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(360px, 0.45fr) minmax(0, 1fr);
-  min-height: 475px;
-  margin: 0 clamp(22px, 3.8vw, 54px);
-  padding: 44px 28px 20px;
+  grid-template-columns: minmax(430px, 0.39fr) minmax(0, 1fr);
+  min-height: 428px;
+  margin: 0 clamp(24px, 3.9vw, 60px);
+  padding: 34px 28px 14px;
   border: 1px solid rgba(235, 235, 224, 0.14);
   border-top: 0;
   overflow: hidden;
@@ -1322,16 +1322,16 @@ input[type="range"] {
 }
 
 .hudHeroCopy {
-  max-width: 620px;
-  padding-top: 8px;
+  max-width: 690px;
+  padding-top: 2px;
 }
 
 .hudStep,
 .hudFormats {
   color: #b5b9b2;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.86rem;
-  letter-spacing: 0.03em;
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -1340,52 +1340,52 @@ input[type="range"] {
 }
 
 .hudHeroCopy h1 {
-  margin: 26px 0 0;
-  max-width: 610px;
+  margin: 20px 0 0;
+  max-width: 690px;
   color: #f3f3ed;
   font-family: Impact, Haettenschweiler, "Arial Narrow Bold", Inter, sans-serif;
-  font-size: clamp(4rem, 7.3vw, 6.6rem);
+  font-size: clamp(3.4rem, 4.9vw, 5.35rem);
   font-weight: 900;
   line-height: 0.96;
   text-transform: uppercase;
 }
 
 .hudHeroCopy > p:not(.hudStep) {
-  max-width: 470px;
+  max-width: 430px;
   color: #aeb3ae;
-  font-size: 1.18rem;
-  line-height: 1.55;
-  margin: 20px 0 0;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  margin: 18px 0 0;
 }
 
 .hudHeroActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 18px;
-  margin-top: 30px;
+  gap: 14px;
+  margin-top: 24px;
 }
 
 .hudHeroActions button,
 .hudHeroActions .uploadButton {
-  min-width: 200px;
+  min-width: 176px;
   justify-content: space-between;
-  padding: 0 22px;
+  padding: 0 18px;
 }
 
 .hudFormats {
   display: block;
-  margin-top: 22px;
-  line-height: 1.65;
+  margin-top: 18px;
+  line-height: 1.55;
 }
 
 .hudMapStage {
-  min-height: 430px;
+  min-height: 372px;
 }
 
 .hudBlueprint {
   width: 100%;
   height: 100%;
-  min-height: 430px;
+  min-height: 372px;
 }
 
 .wireBuilding {
@@ -1397,7 +1397,7 @@ input[type="range"] {
 .routeGlow {
   fill: none;
   stroke: rgba(207, 255, 0, 0.22);
-  stroke-width: 3.2;
+  stroke-width: 2.45;
   filter: url(#glow);
 }
 
@@ -1413,14 +1413,14 @@ input[type="range"] {
 .startRing {
   fill: transparent;
   stroke: #28ff75;
-  stroke-width: 1.2;
+  stroke-width: 1;
   filter: url(#glow);
 }
 
 .endRing {
   fill: transparent;
   stroke: #ff3a32;
-  stroke-width: 1.2;
+  stroke-width: 1;
   filter: url(#glow);
 }
 
@@ -1439,23 +1439,23 @@ input[type="range"] {
   position: absolute;
   border: 1px solid rgba(235, 235, 224, 0.2);
   background: rgba(2, 9, 10, 0.74);
-  padding: 16px 18px;
+  padding: 12px 14px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   text-transform: uppercase;
 }
 
 .hudScore {
-  left: 8%;
-  top: 8%;
-  min-width: 210px;
+  left: 7%;
+  top: 5%;
+  min-width: 190px;
 }
 
 .hudScore span,
 .hudRiskLegend span {
   display: block;
   color: #a5aaa4;
-  font-size: 0.76rem;
-  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  letter-spacing: 0.09em;
 }
 
 .hudScore strong {
@@ -1463,13 +1463,13 @@ input[type="range"] {
   align-items: baseline;
   gap: 6px;
   color: #28ff75;
-  font-size: 3.1rem;
+  font-size: 2.65rem;
   line-height: 1;
 }
 
 .hudScore small {
   color: #9ba09b;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .hudScore em {
@@ -1480,13 +1480,13 @@ input[type="range"] {
 
 .hudRiskLegend {
   right: 2%;
-  top: 8%;
+  top: 5%;
   display: grid;
   grid-template-columns: 26px 1fr;
   gap: 8px 10px;
   min-width: 170px;
   color: #aeb3ae;
-  font-size: 0.76rem;
+  font-size: 0.68rem;
 }
 
 .hudRiskLegend span {
@@ -1506,28 +1506,28 @@ input[type="range"] {
 .hudWorkflow {
   display: grid;
   grid-template-columns: minmax(230px, 0.9fr) minmax(230px, 0.8fr) minmax(360px, 1.55fr) minmax(230px, 0.85fr);
-  gap: 14px;
-  margin: 18px clamp(22px, 3.8vw, 54px) 0;
+  gap: 12px;
+  margin: 14px clamp(24px, 3.9vw, 60px) 0;
 }
 
 .hudCard {
   min-width: 0;
   border: 1px solid rgba(235, 235, 224, 0.16);
   background: linear-gradient(140deg, rgba(7, 18, 20, 0.92), rgba(2, 7, 8, 0.96));
-  padding: 22px;
+  padding: 18px;
 }
 
 .hudCard header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   text-transform: uppercase;
 }
 
 .hudCard h2 {
-  font-size: 0.98rem;
+  font-size: 0.82rem;
   letter-spacing: 0.06em;
 }
 
@@ -1536,13 +1536,13 @@ input[type="range"] {
 }
 
 .hudDropZone {
-  min-height: 122px;
+  min-height: 104px;
   border: 1px dashed rgba(235, 235, 224, 0.24);
   display: grid;
   place-items: center;
   align-content: center;
   gap: 8px;
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   cursor: pointer;
 }
 
@@ -1561,8 +1561,8 @@ input[type="range"] {
   align-items: center;
   border: 1px solid rgba(235, 235, 224, 0.12);
   background: rgba(255, 255, 255, 0.04);
-  padding: 14px;
-  margin-bottom: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
 }
 
 .hudFileRow strong,
@@ -1598,9 +1598,9 @@ input[type="range"] {
   gap: 14px;
   color: #8d938e;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.86rem;
+  font-size: 0.72rem;
   letter-spacing: 0.04em;
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   text-transform: uppercase;
 }
 
@@ -1613,12 +1613,12 @@ input[type="range"] {
 }
 
 .processingProgress {
-  margin-top: 38px;
+  margin-top: 26px;
 }
 
 .hudFrame {
   position: relative;
-  min-height: 186px;
+  min-height: 160px;
   border: 1px solid rgba(235, 235, 224, 0.14);
   overflow: hidden;
 }
@@ -1627,7 +1627,7 @@ input[type="range"] {
 .hudSyntheticFrame {
   width: 100%;
   height: 100%;
-  min-height: 186px;
+  min-height: 160px;
   object-fit: cover;
   filter: grayscale(1) contrast(1.15) brightness(0.7);
   background:
@@ -1758,7 +1758,7 @@ input[type="range"] {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
-  margin: 18px clamp(22px, 3.8vw, 54px) 0;
+  margin: 14px clamp(24px, 3.9vw, 60px) 0;
   border: 1px solid rgba(235, 235, 224, 0.16);
   background: rgba(2, 7, 8, 0.82);
 }
@@ -1767,7 +1767,7 @@ input[type="range"] {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: 7px 18px;
-  padding: 22px 30px;
+  padding: 18px 26px;
   border-left: 1px solid rgba(235, 235, 224, 0.1);
 }
 

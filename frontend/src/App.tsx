@@ -430,11 +430,11 @@ function HudRouteBlueprint() {
         <rect key={index} x={8 + (index % 10) * 9} y={10 + Math.floor(index / 10) * 20} width="5.5" height="8" className="wireBuilding" />
       ))}
       <polyline points="23,48 31,50 39,55 44,59 54,58 64,57 73,53 81,54 86,65 92,76" className="routeGlow" />
-      {dots.map(([x, y, color], index) => <circle key={`${x}-${y}-${index}`} cx={x} cy={y} r="1.25" className={`routeDot ${color}`} />)}
-      <circle cx="21" cy="47" r="3.4" className="startRing" />
+      {dots.map(([x, y, color], index) => <circle key={`${x}-${y}-${index}`} cx={x} cy={y} r="0.95" className={`routeDot ${color}`} />)}
+      <circle cx="21" cy="47" r="2.9" className="startRing" />
       <text x="18" y="55" className="mapLabel start">START</text>
       <text x="18" y="59" className="mapLabel">STUDENT CENTER</text>
-      <circle cx="92" cy="76" r="3.4" className="endRing" />
+      <circle cx="92" cy="76" r="2.9" className="endRing" />
       <text x="90" y="85" className="mapLabel end">END</text>
       <text x="90" y="89" className="mapLabel">DORMS</text>
     </svg>
