@@ -23,7 +23,7 @@ def apply_simulation_event(graph: Any, event: str) -> str:
         for node in graph.nodes:
             if node["id"] == "parking_lot":
                 node["status"] = "blocked"
-        explanation = "Path Blocked closed the Parking Lot connector and east dorm approach, forcing the planner to reroute."
+        explanation = "Path Blocked closed the Quintyne Parking Lot connector and east dorm approach, forcing the planner to reroute."
     elif event == "high_activity_zone":
         center = "student_center"
         neighbor_ids = {center, "quad", "dining_hall", "library"}
@@ -32,7 +32,7 @@ def apply_simulation_event(graph: Any, event: str) -> str:
                 node["motion_score"] = min(1.0, round(node["motion_score"] + 0.28, 3))
                 node["crowd_score"] = min(1.0, round(node["crowd_score"] + 0.18, 3))
                 node["lighting_score"] = min(1.0, round(node["lighting_score"] + 0.04, 3))
-        explanation = "High Activity Zone increased motion and crowd signals near the Student Center."
+        explanation = "High Activity Zone increased motion and crowd signals near the Campus Center."
     else:
         raise ValueError(f"Unsupported simulation event '{event}'.")
 

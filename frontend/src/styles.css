@@ -694,7 +694,7 @@ input[type="range"] {
     linear-gradient(rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.48)),
     linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    url("/campus-map.png"),
+    url("/campus-map.jpg"),
     #050505;
   background-position: center, center, center, center, center;
   background-repeat: no-repeat, repeat, repeat, no-repeat, no-repeat;
@@ -767,11 +767,11 @@ input[type="range"] {
 }
 
 .nodeLabel {
-  font-size: 2.1px;
+  font-size: 1.55px;
   fill: #f4f4f0;
   paint-order: stroke;
   stroke: #000000;
-  stroke-width: 1.25px;
+  stroke-width: 1px;
   stroke-linejoin: round;
 }
 
