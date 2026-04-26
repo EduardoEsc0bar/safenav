@@ -1767,6 +1767,98 @@ input[type="range"] {
   padding: clamp(22px, 3vw, 34px);
 }
 
+.howItWorksPage {
+  min-height: calc(100vh - 72px);
+  padding: clamp(34px, 5vw, 72px) clamp(24px, 3.9vw, 60px) 56px;
+}
+
+.howPageHero {
+  min-height: 360px;
+  border: 1px solid rgba(235, 235, 224, 0.16);
+  background:
+    radial-gradient(circle at 80% 30%, rgba(207, 255, 0, 0.12), transparent 260px),
+    radial-gradient(circle at 16% 80%, rgba(40, 255, 117, 0.11), transparent 240px),
+    linear-gradient(135deg, rgba(3, 12, 14, 0.95), rgba(0, 0, 0, 0.96));
+  display: grid;
+  align-content: center;
+  padding: clamp(28px, 5vw, 64px);
+}
+
+.howPageHero span {
+  color: #ccff00;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.howPageHero h1 {
+  max-width: 980px;
+  margin: 18px 0 0;
+  color: #f3f3ed;
+  font-size: clamp(4rem, 8vw, 8rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.howPageHero p {
+  max-width: 760px;
+  margin: 24px 0 0;
+  color: #aeb3ae;
+  font-size: clamp(1rem, 1.35vw, 1.35rem);
+  line-height: 1.55;
+}
+
+.howPageHero button {
+  width: fit-content;
+  min-width: 248px;
+  margin-top: 30px;
+  border-color: rgba(207, 255, 0, 0.86);
+  background: #ccff00;
+  color: #061006;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.howItWorksPanel.standalone {
+  margin: 14px 0 0;
+}
+
+.howDetailGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.howDetailGrid article {
+  border: 1px solid rgba(235, 235, 224, 0.14);
+  background: rgba(2, 7, 8, 0.82);
+  padding: 22px;
+}
+
+.howDetailGrid span {
+  color: #ccff00;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.howDetailGrid strong {
+  display: block;
+  margin-top: 14px;
+  color: #f3f3ed;
+  font-size: 1.18rem;
+  line-height: 1.2;
+}
+
+.howDetailGrid p {
+  margin: 12px 0 0;
+  color: #9da39e;
+  line-height: 1.5;
+}
+
 .howItWorksHeader {
   display: grid;
   grid-template-columns: minmax(240px, 0.72fr) minmax(320px, 1fr);
@@ -2219,7 +2311,8 @@ input[type="range"] {
   }
 
   .howItWorksHeader,
-  .howItWorksGrid {
+  .howItWorksGrid,
+  .howDetailGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -2344,6 +2437,11 @@ input[type="range"] {
   }
 
   .hudNavLinks {
+    display: flex;
+    width: 100%;
+  }
+
+  .hudNavLinks span {
     display: none;
   }
 
@@ -2382,14 +2480,37 @@ input[type="range"] {
     font-size: clamp(3.3rem, 17vw, 4.8rem);
   }
 
+  .howItWorksPage {
+    padding: 18px 18px 42px;
+  }
+
+  .howPageHero {
+    min-height: auto;
+    padding: 28px 20px;
+  }
+
+  .howPageHero h1 {
+    font-size: clamp(3rem, 15vw, 5rem);
+  }
+
+  .howPageHero button {
+    width: 100%;
+  }
+
   .howItWorksPanel {
     margin-left: 18px;
     margin-right: 18px;
     padding: 20px;
   }
 
+  .howItWorksPanel.standalone {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
   .howItWorksHeader,
-  .howItWorksGrid {
+  .howItWorksGrid,
+  .howDetailGrid {
     grid-template-columns: 1fr;
   }
 

@@ -31,8 +31,8 @@ export default function App() {
   const [slamFileName, setSlamFileName] = useState("");
   const [liveMode, setLiveMode] = useState(false);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState<"home" | "how">("home");
   const visualRef = useRef<HTMLElement | null>(null);
-  const howItWorksRef = useRef<HTMLElement | null>(null);
   const workflowRef = useRef<HTMLElement | null>(null);
 
   const selectedNode = useMemo(() => graph.nodes.find((node) => node.id === selectedNodeId) ?? null, [graph.nodes, selectedNodeId]);
@@ -47,15 +47,26 @@ export default function App() {
     });
   }, []);
 
-  const scrollToHowItWorks = useCallback(() => {
+  const showHome = useCallback(() => {
+    setCurrentPage("home");
     window.requestAnimationFrame(() => {
-      howItWorksRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }, []);
+
+  const showHowItWorks = useCallback(() => {
+    setCurrentPage("how");
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }, []);
 
   const scrollToVisualMapping = useCallback(() => {
+    setCurrentPage("home");
     window.requestAnimationFrame(() => {
-      visualRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.requestAnimationFrame(() => {
+        visualRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     });
   }, []);
 
@@ -236,7 +247,7 @@ export default function App() {
           <span>SAFENAV</span>
         </div>
         <nav className="hudNavLinks" aria-label="SafeNav sections">
-          <button type="button" onClick={scrollToHowItWorks}>How It Works</button>
+          <button type="button" onClick={currentPage === "how" ? showHome : showHowItWorks}>{currentPage === "how" ? "Home" : "How It Works"}</button>
           <span>Campus Safety</span>
           <span>For Cities</span>
           <span>About</span>
@@ -250,13 +261,17 @@ export default function App() {
 
       {error && <div className="errorBanner">{error}</div>}
 
+      {currentPage === "how" ? (
+        <HowItWorksPage onStartDemo={scrollToVisualMapping} />
+      ) : (
+        <>
       <section className="pathHomeHero">
         <div className="pathHomeCopy">
           <h1>Your safest path home.</h1>
           <p>SafeNav uses camera-based perception, visual mapping, and risk-aware routing to guide students across campus at night.</p>
           <div className="pathHomeActions">
             <button type="button" onClick={scrollToVisualMapping}>Find Your Safe Route <ArrowUpRight size={17} /></button>
-            <button type="button" onClick={scrollToHowItWorks}>See How It Works <Circle size={15} /></button>
+            <button type="button" onClick={showHowItWorks}>See How It Works <Circle size={15} /></button>
           </div>
         </div>
         <aside className="pathHomeCard">
@@ -300,47 +315,6 @@ export default function App() {
             slamProcessing={slamProcessing}
             slamResult={slamResult}
           />
-        </div>
-      </section>
-
-      <section className="howItWorksPanel" ref={howItWorksRef}>
-        <div className="howItWorksHeader">
-          <span>System Pipeline</span>
-          <h2>How SafeNav Works</h2>
-          <p>SafeNav treats a walking route like a small autonomy problem: video becomes perception features, features update risk, risk updates the graph, and planners recompute the safer path.</p>
-        </div>
-        <div className="howItWorksGrid">
-          <article>
-            <span>01</span>
-            <strong>Upload or simulate sensor input</strong>
-            <p>A campus walk video is sampled into keyframes so the demo can inspect lighting, blur, motion, and visual texture over time.</p>
-          </article>
-          <article>
-            <span>02</span>
-            <strong>Estimate camera motion</strong>
-            <p>ORB features are matched between frames, RANSAC filters outliers, and SLAM-lite estimates pose plus sparse 3D structure.</p>
-          </article>
-          <article>
-            <span>03</span>
-            <strong>Convert perception into risk</strong>
-            <p>Lighting, visibility, obstruction, crowd proxy, motion, and map confidence are converted into a plain-English safety signal.</p>
-          </article>
-          <article>
-            <span>04</span>
-            <strong>Replan on the campus graph</strong>
-            <p>Dijkstra and A* compare distance against dynamic risk, avoid blocked paths, and expose latency, visited nodes, and reroute counts.</p>
-          </article>
-        </div>
-        <div className="howItWorksTrace">
-          <span>Video</span>
-          <i />
-          <span>Perception</span>
-          <i />
-          <span>Risk</span>
-          <i />
-          <span>Graph</span>
-          <i />
-          <span>Route</span>
         </div>
       </section>
 
@@ -462,7 +436,81 @@ export default function App() {
           <MetricsPanel route={route} metrics={metrics} />
         </aside>
       </div>
+        </>
+      )}
     </main>
+  );
+}
+
+function HowItWorksPage({ onStartDemo }: { onStartDemo: () => void }) {
+  return (
+    <section className="howItWorksPage">
+      <div className="howPageHero">
+        <span>System Pipeline</span>
+        <h1>How SafeNav Works</h1>
+        <p>SafeNav treats a walking route like a small autonomy problem: video becomes perception features, perception updates risk, risk updates the graph, and planners recompute the safer route.</p>
+        <button type="button" onClick={onStartDemo}>Open Visual Mapping Mode <ArrowUpRight size={17} /></button>
+      </div>
+
+      <div className="howItWorksPanel standalone">
+        <div className="howItWorksHeader">
+          <span>Autonomy Stack</span>
+          <h2>From Footage To Route Decision</h2>
+          <p>The demo is designed to show perception engineering, SLAM-lite reasoning, risk estimation, graph modeling, and path planning in one end-to-end loop.</p>
+        </div>
+        <div className="howItWorksGrid">
+          <article>
+            <span>01</span>
+            <strong>Upload or simulate sensor input</strong>
+            <p>A campus walk video is sampled into keyframes so the demo can inspect lighting, blur, motion, and visual texture over time.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <strong>Estimate camera motion</strong>
+            <p>ORB features are matched between frames, RANSAC filters outliers, and SLAM-lite estimates pose plus sparse 3D structure.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <strong>Convert perception into risk</strong>
+            <p>Lighting, visibility, obstruction, crowd proxy, motion, and map confidence are converted into a plain-English safety signal.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <strong>Replan on the campus graph</strong>
+            <p>Dijkstra and A* compare distance against dynamic risk, avoid blocked paths, and expose latency, visited nodes, and reroute counts.</p>
+          </article>
+        </div>
+        <div className="howItWorksTrace">
+          <span>Video</span>
+          <i />
+          <span>Perception</span>
+          <i />
+          <span>Risk</span>
+          <i />
+          <span>Graph</span>
+          <i />
+          <span>Route</span>
+        </div>
+      </div>
+
+      <div className="howDetailGrid">
+        <article>
+          <span>Perception</span>
+          <strong>Scene quality becomes a signal.</strong>
+          <p>Brightness, blur, motion, obstruction uncertainty, and feature quality explain whether SafeNav should trust the current view.</p>
+        </article>
+        <article>
+          <span>Planning</span>
+          <strong>The route is not just shortest path.</strong>
+          <p>The graph planner weighs distance against dynamic risk so blocked, dark, or low-confidence areas can trigger rerouting.</p>
+        </article>
+        <article>
+          <span>Metrics</span>
+          <strong>Every decision exposes runtime evidence.</strong>
+          <p>Compute time, visited nodes, inlier ratio, SLAM latency, map confidence, and route cost make the demo interview-friendly.</p>
+        </article>
+      </div>
+    </section>
   );
 }
 
