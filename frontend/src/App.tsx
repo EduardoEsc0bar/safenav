@@ -285,18 +285,14 @@ export default function App() {
         </div>
 
         <div className="hudMapStage">
-          <div className="hudScore">
-            <span>Safety Score</span>
-            <strong>{safetyScore.toFixed(1)}<small>/10</small></strong>
-            <em>{safetyLabel}</em>
-          </div>
-          <div className="hudRiskLegend">
-            <span>Risk Level</span>
-            <i className="lowLine" /> Low Risk
-            <i className="mediumLine" /> Moderate
-            <i className="highLine" /> High Risk
-          </div>
-          <HudRouteBlueprint />
+          <HudMappingConsole
+            firstKeyframe={firstKeyframe}
+            metrics={metrics}
+            safetyLabel={safetyLabel}
+            safetyScore={safetyScore}
+            slamProcessing={slamProcessing}
+            slamResult={slamResult}
+          />
         </div>
       </section>
 
@@ -431,36 +427,71 @@ function HudProcessStep({ label, done, active }: { label: string; done?: boolean
   );
 }
 
-function HudRouteBlueprint() {
-  const dots = [
-    [23, 42, "green"], [27, 43, "green"], [31, 44, "green"], [35, 46, "green"], [39, 49, "green"],
-    [44, 53, "yellow"], [49, 53, "yellow"], [54, 52, "yellow"], [59, 51, "yellow"], [64, 51, "yellow"],
-    [69, 49, "orange"], [73, 47, "orange"], [77, 46, "orange"], [81, 48, "red"], [84, 52, "red"],
-    [86, 57, "red"], [89, 62, "red"], [92, 66, "red"]
-  ];
+function HudMappingConsole({
+  firstKeyframe,
+  metrics,
+  safetyLabel,
+  safetyScore,
+  slamProcessing,
+  slamResult
+}: {
+  firstKeyframe: SlamLiteResult["keyframeInstances"][number] | null;
+  metrics: RuntimeMetrics | null;
+  safetyLabel: string;
+  safetyScore: number;
+  slamProcessing: boolean;
+  slamResult: SlamLiteResult | null;
+}) {
+  const confidence = slamResult?.mapConfidence ?? (metrics && metrics.map_confidence > 0 ? metrics.map_confidence : 0.68);
+  const inlierRatio = slamResult?.totalMatches ? slamResult.inlierMatches / slamResult.totalMatches : 0.62;
+  const latency = slamResult?.processingLatencyMs ?? metrics?.slam_processing_latency_ms ?? 0;
+  const modeLabel = slamProcessing ? "Processing" : slamResult ? "Reconstruction ready" : "Awaiting footage";
 
   return (
-    <svg className="hudBlueprint" viewBox="0 0 100 100" role="img" aria-label="SafeNav risk-colored route blueprint">
-      <defs>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="2.4" result="coloredBlur" />
-          <feMerge>
-            <feMergeNode in="coloredBlur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      {Array.from({ length: 30 }).map((_, index) => (
-        <rect key={index} x={8 + (index % 10) * 9} y={10 + Math.floor(index / 10) * 20} width="5.5" height="8" className="wireBuilding" />
-      ))}
-      <polyline points="23,42 31,44 39,49 44,53 54,52 64,51 73,47 81,48 86,57 92,66" className="routeGlow" />
-      {dots.map(([x, y, color], index) => <circle key={`${x}-${y}-${index}`} cx={x} cy={y} r="0.95" className={`routeDot ${color}`} />)}
-      <circle cx="21" cy="41" r="2.9" className="startRing" />
-      <text x="18" y="49" className="mapLabel start">START</text>
-      <text x="18" y="53" className="mapLabel">STUDENT CENTER</text>
-      <circle cx="92" cy="66" r="2.9" className="endRing" />
-      <text x="90" y="75" className="mapLabel end">END</text>
-      <text x="90" y="79" className="mapLabel">DORMS</text>
-    </svg>
+    <div className="mappingConsole" aria-label="SLAM-lite visual mapping console">
+      <div className="mappingConsoleHeader">
+        <span>SLAM-lite Visual Odometry</span>
+        <strong>{modeLabel}</strong>
+      </div>
+
+      <div className="sensorFrameHero">
+        {firstKeyframe?.imageDataUrl ? (
+          <img src={firstKeyframe.imageDataUrl} alt={`${firstKeyframe.title} feature analysis`} />
+        ) : (
+          <div className="syntheticSensorScene">
+            <i className="syntheticLight one" />
+            <i className="syntheticLight two" />
+            <i className="syntheticBox a" />
+            <i className="syntheticBox b" />
+            <i className="syntheticBox c" />
+          </div>
+        )}
+        <div className="featureOverlay">
+          <i style={{ left: "18%", top: "38%" }} />
+          <i style={{ left: "31%", top: "55%" }} />
+          <i style={{ left: "46%", top: "42%" }} />
+          <i style={{ left: "61%", top: "62%" }} />
+          <i style={{ left: "76%", top: "36%" }} />
+        </div>
+        <div className="frameReadout">
+          <span>{firstKeyframe?.title ?? "Frame Stream"}</span>
+          <strong>{firstKeyframe ? `${firstKeyframe.keypoints} keypoints` : "ORB ready"}</strong>
+        </div>
+      </div>
+
+      <div className="mappingStatsGrid">
+        <div><span>Safety Score</span><strong>{safetyScore.toFixed(1)}<small>/10</small></strong><em>{safetyLabel}</em></div>
+        <div><span>Map Confidence</span><strong>{confidence.toFixed(2)}</strong><em>{confidence >= 0.7 ? "Strong" : "Watch"}</em></div>
+        <div><span>Inlier Ratio</span><strong>{Math.round(inlierRatio * 100)}%</strong><em>RANSAC</em></div>
+        <div><span>SLAM Latency</span><strong>{latency ? `${Math.round(latency)}ms` : "--"}</strong><em>Pipeline</em></div>
+      </div>
+
+      <div className="pipelineTrace">
+        <span className="done">Frames</span>
+        <span className={slamResult ? "done" : slamProcessing ? "active" : ""}>ORB</span>
+        <span className={slamResult ? "done" : ""}>Pose</span>
+        <span className={slamResult ? "done" : ""}>Risk</span>
+      </div>
+    </div>
   );
 }
